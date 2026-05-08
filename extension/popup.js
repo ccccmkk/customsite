@@ -189,6 +189,92 @@ function renderBgList() {
 // ── 메뉴 체크박스 ──
 const MENU_KEYS = ['lnb','gnbInner','result','menu01','menu02','menu03','menu04','menu05'];
 
+// ── 게시판 · 알림판 패널 ──
+const BOARD_PANEL_DEFS = [
+  { key: 'board_01', label: '게시판① 정책/교육/일반공지', icon: '📋' },
+  { key: 'board_02', label: '게시판② 보도자료',           icon: '📰' },
+  { key: 'board_03', label: '게시판③ 우리부소식',          icon: '📢' },
+  { key: 'board_04', label: '게시판④ 업무노하우',          icon: '💡' },
+  { key: 'popzone',  label: '알림판',                     icon: '🖼' },
+];
+
+let boardPanelConfig = {};
+BOARD_PANEL_DEFS.forEach(d => {
+  boardPanelConfig[d.key] = { hidden: false, imageData: null, mode: 'overlay' };
+});
+
+let panelFileKey = null;
+
+document.getElementById('panelFileInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file || !panelFileKey) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    boardPanelConfig[panelFileKey].imageData = ev.target.result;
+    renderBoardPanels();
+  };
+  reader.readAsDataURL(file);
+  e.target.value = '';
+});
+
+function renderBoardPanels() {
+  const area = document.getElementById('boardPanelArea');
+  area.innerHTML = '';
+  BOARD_PANEL_DEFS.forEach(def => {
+    const cfg = boardPanelConfig[def.key];
+
+    const item = document.createElement('div');
+
+    const row = document.createElement('div');
+    row.className = 'menu-item';
+    const icon = document.createElement('span'); icon.className = 'menu-icon'; icon.textContent = def.icon;
+    const name = document.createElement('span'); name.className = 'menu-name'; name.textContent = def.label;
+    const chk = document.createElement('input'); chk.type = 'checkbox'; chk.className = 'chk';
+    chk.checked = !cfg.hidden;
+    chk.addEventListener('change', () => { cfg.hidden = !chk.checked; });
+    row.append(icon, name, chk);
+    item.appendChild(row);
+
+    const imgRow = document.createElement('div');
+    imgRow.className = 'bp-img-row';
+
+    const upBtn = document.createElement('button');
+    upBtn.className = 'upload-btn';
+    upBtn.textContent = cfg.imageData ? '🖼 이미지 변경' : '📁 캐릭터/이미지';
+    upBtn.addEventListener('click', () => {
+      panelFileKey = def.key;
+      document.getElementById('panelFileInput').click();
+    });
+    imgRow.appendChild(upBtn);
+
+    if (cfg.imageData) {
+      const modeSel = document.createElement('select');
+      [['overlay', '투명 오버레이'], ['cover', '전체 교체']].forEach(([v, l]) => {
+        const o = document.createElement('option'); o.value = v; o.textContent = l;
+        if (cfg.mode === v) o.selected = true;
+        modeSel.appendChild(o);
+      });
+      modeSel.addEventListener('change', () => { cfg.mode = modeSel.value; });
+      imgRow.appendChild(modeSel);
+
+      const rmBtn = document.createElement('button');
+      rmBtn.className = 'bg-remove'; rmBtn.textContent = '✕'; rmBtn.title = '이미지 제거';
+      rmBtn.addEventListener('click', () => { cfg.imageData = null; renderBoardPanels(); });
+      imgRow.appendChild(rmBtn);
+    }
+    item.appendChild(imgRow);
+
+    if (cfg.imageData) {
+      const prev = document.createElement('img');
+      prev.className = 'bp-preview';
+      prev.src = cfg.imageData;
+      item.appendChild(prev);
+    }
+
+    area.appendChild(item);
+  });
+}
+
 // ── 테마 빌드 ──
 function buildTheme() {
   const colors = { enabled: {} };
@@ -211,6 +297,7 @@ function buildTheme() {
     colors,
     backgrounds: bgCards.filter(c => c.imageData),
     menuConfig,
+    boardPanels: boardPanelConfig,
     customCSS: document.getElementById('customCSS').value
   };
 }
@@ -268,6 +355,28 @@ function generateCSS(theme) {
   if (mc.lnb === false)      css += `header nav #lnb { display: none !important; }\n`;
   if (mc.gnbInner === false) css += `header nav .darkGnbWrap { display: none !important; }\n`;
   if (mc.result === false)   css += `header nav .inner:not(#lnb):not(.darkGnbWrap) { display: none !important; }\n`;
+
+  const BOARD_SEL = {
+    board_01: '.notice1.board_01',
+    board_02: '.notice1.board_02',
+    board_03: '.notice2.board_03',
+    board_04: '.notice2.board_04',
+    popzone:  'div.popzone',
+  };
+  const bp = theme.boardPanels || {};
+  Object.entries(BOARD_SEL).forEach(([key, sel]) => {
+    const cfg = bp[key] || {};
+    if (cfg.hidden) {
+      css += `${sel} { display: none !important; }\n`;
+    } else if (cfg.imageData) {
+      css += `${sel} { position: relative !important; overflow: hidden !important; }\n`;
+      if (cfg.mode === 'cover') {
+        css += `${sel}::after { content:'' !important; position:absolute !important; inset:0 !important; background: white url("${cfg.imageData}") center/contain no-repeat !important; z-index:100 !important; }\n`;
+      } else {
+        css += `${sel}::after { content:'' !important; position:absolute !important; inset:0 !important; background: url("${cfg.imageData}") center/contain no-repeat !important; z-index:100 !important; pointer-events:none !important; }\n`;
+      }
+    }
+  });
 
   if (theme.customCSS?.trim()) css += '\n/* 커스텀 CSS */\n' + theme.customCSS + '\n';
   return css;
@@ -363,7 +472,7 @@ function showMsg(msg, isErr=false) {
 // ── 초기 로드: 저장된 테마 복원 ──
 chrome.storage.local.get('portalTheme', data => {
   const theme = data.portalTheme;
-  if (!theme) { renderBgList(); return; }
+  if (!theme) { renderBgList(); renderBoardPanels(); return; }
 
   updateStatusBadge(true);
 
@@ -385,6 +494,14 @@ chrome.storage.local.get('portalTheme', data => {
     bgCards = theme.backgrounds;
   }
   renderBgList();
+
+  // 게시판 패널 복원
+  if (theme.boardPanels) {
+    BOARD_PANEL_DEFS.forEach(d => {
+      if (theme.boardPanels[d.key]) Object.assign(boardPanelConfig[d.key], theme.boardPanels[d.key]);
+    });
+  }
+  renderBoardPanels();
 
   // 메뉴 복원
   const mc = theme.menuConfig || {};

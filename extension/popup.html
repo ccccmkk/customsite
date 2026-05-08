@@ -70,6 +70,10 @@ textarea:focus{border-color:#4fc3f7}
 .bot-msg{font-size:10px;margin-left:auto;opacity:0;transition:opacity .3s}
 .bot-msg.show{opacity:1}
 input[type=file]{display:none}
+.bp-img-row{display:flex;gap:6px;align-items:center;padding:4px 10px 5px}
+.bp-img-row .upload-btn{flex:1;padding:5px}
+.bp-img-row select{width:auto;flex-shrink:0;font-size:10px}
+.bp-preview{display:block;margin:0 10px 6px;width:calc(100% - 20px);height:50px;object-fit:contain;background:#0a1628;border-radius:4px;border:1px solid #2d4a6e}
 </style>
 </head>
 <body>
@@ -125,6 +129,7 @@ input[type=file]{display:none}
   <div id="bgList"></div>
   <button class="add-bg-btn" id="addBgBtn">＋ 배경 이미지 추가</button>
   <input type="file" id="bgFileInput" accept="image/*">
+  <input type="file" id="panelFileInput" accept="image/*">
 </div>
 
 <div class="panel" id="tab-menu">
@@ -138,6 +143,8 @@ input[type=file]{display:none}
   <div class="menu-item"><span class="menu-icon">👤</span><span class="menu-name">e-사람</span><span class="menu-badge">.menu03</span><input type="checkbox" class="chk" id="mc_menu03" checked></div>
   <div class="menu-item"><span class="menu-icon">📚</span><span class="menu-name">배우리/문자발송</span><span class="menu-badge">.menu04</span><input type="checkbox" class="chk" id="mc_menu04" checked></div>
   <div class="menu-item"><span class="menu-icon">🤝</span><span class="menu-name">노사누리</span><span class="menu-badge">.menu05</span><input type="checkbox" class="chk" id="mc_menu05" checked></div>
+  <div class="menu-sep">게시판 · 알림판</div>
+  <div id="boardPanelArea"></div>
 </div>
 
 <div class="panel" id="tab-css">
