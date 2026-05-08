@@ -80,6 +80,29 @@ function generateCSS(theme) {
   if (mc.gnbInner === false) css += `header nav .darkGnbWrap { display: none !important; }\n`;
   if (mc.result === false)   css += `header nav .inner:not(#lnb):not(.darkGnbWrap) { display: none !important; }\n`;
 
+  // ── 게시판 · 알림판 패널 ──
+  const BOARD_SEL = {
+    board_01: '.notice1.board_01',
+    board_02: '.notice1.board_02',
+    board_03: '.notice2.board_03',
+    board_04: '.notice2.board_04',
+    popzone:  'div.popzone',
+  };
+  const bp = theme.boardPanels || {};
+  Object.entries(BOARD_SEL).forEach(([key, sel]) => {
+    const cfg = bp[key] || {};
+    if (cfg.hidden) {
+      css += `${sel} { display: none !important; }\n`;
+    } else if (cfg.imageData) {
+      css += `${sel} { position: relative !important; overflow: hidden !important; }\n`;
+      if (cfg.mode === 'cover') {
+        css += `${sel}::after { content:'' !important; position:absolute !important; inset:0 !important; background: white url("${cfg.imageData}") center/contain no-repeat !important; z-index:100 !important; }\n`;
+      } else {
+        css += `${sel}::after { content:'' !important; position:absolute !important; inset:0 !important; background: url("${cfg.imageData}") center/contain no-repeat !important; z-index:100 !important; pointer-events:none !important; }\n`;
+      }
+    }
+  });
+
   // ── 커스텀 CSS ──
   if (theme.customCSS && theme.customCSS.trim())
     css += '\n/* ─ 커스텀 CSS ─ */\n' + theme.customCSS + '\n';
