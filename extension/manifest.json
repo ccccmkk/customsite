@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "포털 테마 커스터마이저",
+  "version": "2.0",
+  "description": "dauri 포털 색상/배경/메뉴 커스터마이징",
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": ["http://dauri.moel.go.kr/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "포털 테마 커스터마이저"
+  },
+  "content_scripts": [{
+    "matches": ["http://dauri.moel.go.kr/*"],
+    "js": ["content.js"],
+    "run_at": "document_idle"
+  }]
+}

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>포털 테마 커스터마이저</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{width:420px;font-family:'Malgun Gothic','맑은 고딕',sans-serif;font-size:12px;background:#0f172a;color:#e2e8f0}
+.hd{background:linear-gradient(135deg,#1e3a5f,#0f2744);padding:11px 14px;display:flex;align-items:center;gap:9px;border-bottom:1px solid #1e3a5f}
+.hd-icon{font-size:20px}
+.hd-title{font-size:13px;font-weight:700;color:#4fc3f7}
+.hd-sub{font-size:10px;color:#64748b;margin-top:1px}
+.hd-status{margin-left:auto;font-size:10px;padding:2px 8px;border-radius:10px;background:#1e293b;color:#64748b}
+.hd-status.on{background:rgba(16,185,129,.15);color:#34d399}
+.tabs{display:flex;background:#0a1628;border-bottom:1px solid #1e3a5f}
+.tab{flex:1;padding:8px 4px;text-align:center;font-size:11px;color:#475569;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s}
+.tab:hover{color:#94a3b8}
+.tab.active{color:#4fc3f7;border-bottom-color:#4fc3f7;background:#0f1e35}
+.panel{display:none;padding:12px;max-height:460px;overflow-y:auto}
+.panel.active{display:block}
+.panel::-webkit-scrollbar{width:3px}
+.panel::-webkit-scrollbar-thumb{background:#1e3a5f;border-radius:2px}
+.sec{margin-bottom:14px}
+.sec-hd{font-size:9px;font-weight:700;color:#4fc3f7;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid #1e3a5f}
+.row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.row-label{font-size:11px;color:#94a3b8;flex:1;min-width:0}
+.color-wrap{display:flex;align-items:center;gap:5px}
+input[type=color]{width:28px;height:22px;border:1px solid #2d4a6e;border-radius:4px;cursor:pointer;background:none;padding:1px;flex-shrink:0}
+.hex-input{width:72px;background:#1e293b;border:1px solid #2d4a6e;border-radius:4px;color:#e2e8f0;padding:3px 6px;font-size:11px;font-family:'Courier New',monospace;outline:none}
+.hex-input:focus{border-color:#4fc3f7}
+.toggle{width:36px;height:18px;background:#1e293b;border:1px solid #2d4a6e;border-radius:9px;cursor:pointer;position:relative;flex-shrink:0;transition:background .2s;user-select:none}
+.toggle.on{background:#0d9488;border-color:#0d9488}
+.toggle::after{content:'';position:absolute;width:12px;height:12px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left .2s}
+.toggle.on::after{left:20px}
+.bg-card{background:#1e293b;border:1px solid #2d4a6e;border-radius:6px;padding:10px;margin-bottom:8px}
+.bg-card-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.bg-card-title{font-size:11px;font-weight:700;color:#e2e8f0}
+.bg-remove{background:none;border:none;color:#ef4444;cursor:pointer;font-size:14px;padding:0 2px}
+select{background:#1e293b;border:1px solid #2d4a6e;border-radius:4px;color:#e2e8f0;padding:3px 6px;font-size:11px;outline:none;cursor:pointer;width:100%}
+select:focus{border-color:#4fc3f7}
+.upload-btn{width:100%;padding:6px;background:#1e3a5f;border:1px dashed #2d6aa0;border-radius:4px;color:#94a3b8;font-size:11px;cursor:pointer;text-align:center;transition:all .15s;font-family:inherit}
+.upload-btn:hover{border-color:#4fc3f7;color:#4fc3f7}
+.img-preview{width:100%;height:60px;object-fit:cover;border-radius:4px;margin:5px 0;border:1px solid #2d4a6e}
+.slider-row{display:flex;align-items:center;gap:6px;margin-top:5px}
+.slider-label{font-size:10px;color:#64748b;width:40px;flex-shrink:0}
+input[type=range]{flex:1;height:3px;-webkit-appearance:none;background:#2d4a6e;border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:#4fc3f7;cursor:pointer}
+.slider-val{font-size:10px;color:#4fc3f7;font-family:'Courier New',monospace;width:34px;text-align:right;flex-shrink:0}
+.add-bg-btn{width:100%;padding:7px;background:#0a1628;border:1px dashed #2d4a6e;border-radius:5px;color:#64748b;font-size:11px;cursor:pointer;transition:all .15s;font-family:inherit}
+.add-bg-btn:hover{border-color:#4fc3f7;color:#4fc3f7}
+.bg-none{font-size:11px;color:#475569;text-align:center;padding:12px;border:1px dashed #1e3a5f;border-radius:5px;margin-bottom:8px}
+.menu-item{display:flex;align-items:center;gap:9px;padding:8px 10px;background:#1e293b;border:1px solid #2d4a6e;border-radius:5px;margin-bottom:5px}
+.menu-icon{font-size:14px;width:20px;text-align:center}
+.menu-name{flex:1;font-size:12px;color:#e2e8f0}
+.menu-badge{font-size:9px;color:#64748b;font-family:'Courier New',monospace;margin-right:4px}
+.chk{width:16px;height:16px;accent-color:#4fc3f7;cursor:pointer;flex-shrink:0}
+.menu-sep{font-size:9px;color:#4fc3f7;letter-spacing:.1em;text-transform:uppercase;margin:10px 0 6px;padding-bottom:4px;border-bottom:1px solid #1e3a5f}
+textarea{width:100%;background:#0a1628;border:1px solid #2d4a6e;border-radius:5px;color:#e2e8f0;padding:8px;font-size:11px;font-family:'Courier New',monospace;resize:vertical;outline:none;line-height:1.6;min-height:200px}
+textarea:focus{border-color:#4fc3f7}
+.css-hint{font-size:10px;color:#475569;margin-bottom:6px;line-height:1.6}
+.css-hint code{background:#1e293b;padding:1px 4px;border-radius:2px;color:#94a3b8;font-family:'Courier New',monospace}
+.bot{padding:10px 12px;background:#0a1628;border-top:1px solid #1e3a5f;display:flex;gap:6px;align-items:center}
+.btn{padding:6px 12px;border:none;border-radius:5px;font-size:11px;cursor:pointer;font-family:inherit;font-weight:600;transition:all .15s;flex-shrink:0}
+.btn-apply{background:#0d9488;color:#fff;flex:1}
+.btn-apply:hover{background:#0f766e}
+.btn-save{background:#1e3a5f;color:#94a3b8;border:1px solid #2d4a6e}
+.btn-save:hover{border-color:#4fc3f7;color:#4fc3f7}
+.btn-reset{background:#1e293b;color:#ef4444;border:1px solid #2d4a6e}
+.btn-reset:hover{border-color:#ef4444}
+.bot-msg{font-size:10px;margin-left:auto;opacity:0;transition:opacity .3s}
+.bot-msg.show{opacity:1}
+input[type=file]{display:none}
+</style>
+</head>
+<body>
+
+<div class="hd">
+  <div class="hd-icon">🎨</div>
+  <div>
+    <div class="hd-title">포털 테마 커스터마이저</div>
+    <div class="hd-sub">dauri.moel.go.kr</div>
+  </div>
+  <div class="hd-status" id="statusBadge">미적용</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" data-tab="color">🎨 색상</div>
+  <div class="tab" data-tab="bg">🖼 배경/이미지</div>
+  <div class="tab" data-tab="menu">📋 메뉴 구성</div>
+  <div class="tab" data-tab="css">✏️ 커스텀 CSS</div>
+</div>
+
+<div class="panel active" id="tab-color">
+  <div class="sec">
+    <div class="sec-hd">헤더 / GNB</div>
+    <div class="row"><span class="row-label">헤더 배경색</span><div class="color-wrap"><div class="toggle" id="tg_headerBg"></div><input type="color" id="cp_headerBg" value="#1a3a6e"><input type="text" class="hex-input" id="hx_headerBg" value="#1a3a6e"></div></div>
+    <div class="row"><span class="row-label">GNB 배경색</span><div class="color-wrap"><div class="toggle" id="tg_gnbBg"></div><input type="color" id="cp_gnbBg" value="#0f2744"><input type="text" class="hex-input" id="hx_gnbBg" value="#0f2744"></div></div>
+    <div class="row"><span class="row-label">GNB 텍스트색</span><div class="color-wrap"><div class="toggle" id="tg_gnbText"></div><input type="color" id="cp_gnbText" value="#ffffff"><input type="text" class="hex-input" id="hx_gnbText" value="#ffffff"></div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-hd">위젯 헤더 (파란 패널)</div>
+    <div class="row"><span class="row-label">배경색</span><div class="color-wrap"><div class="toggle" id="tg_widgetHeaderBg"></div><input type="color" id="cp_widgetHeaderBg" value="#3366cc"><input type="text" class="hex-input" id="hx_widgetHeaderBg" value="#3366cc"></div></div>
+    <div class="row"><span class="row-label">텍스트색</span><div class="color-wrap"><div class="toggle" id="tg_widgetHeaderText"></div><input type="color" id="cp_widgetHeaderText" value="#ffffff"><input type="text" class="hex-input" id="hx_widgetHeaderText" value="#ffffff"></div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-hd">메뉴 섹션 헤더</div>
+    <div class="row"><span class="row-label">배경색</span><div class="color-wrap"><div class="toggle" id="tg_menuHd"></div><input type="color" id="cp_menuHdBg" value="#f1f1f1"><input type="text" class="hex-input" id="hx_menuHdBg" value="#f1f1f1"></div></div>
+    <div class="row"><span class="row-label">텍스트색</span><div class="color-wrap"><input type="color" id="cp_menuHdText" value="#333333" style="margin-left:44px"><input type="text" class="hex-input" id="hx_menuHdText" value="#333333"></div></div>
+    <div class="row"><span class="row-label">메뉴 항목 텍스트</span><div class="color-wrap"><div class="toggle" id="tg_menuText"></div><input type="color" id="cp_menuText" value="#444444"><input type="text" class="hex-input" id="hx_menuText" value="#444444"></div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-hd">액센트 색상</div>
+    <div class="row"><span class="row-label">버튼 강조 / 활성 메뉴</span><div class="color-wrap"><div class="toggle" id="tg_accent"></div><input type="color" id="cp_accent" value="#0a808f"><input type="text" class="hex-input" id="hx_accent" value="#0a808f"></div></div>
+  </div>
+  <div class="sec">
+    <div class="sec-hd">버튼 / 기타</div>
+    <div class="row"><span class="row-label">기본 버튼 (.btnSmall)</span><div class="color-wrap"><div class="toggle" id="tg_btnDefault"></div><input type="color" id="cp_btnDefault" value="#435a7c"><input type="text" class="hex-input" id="hx_btnDefault" value="#435a7c"></div></div>
+    <div class="row"><span class="row-label">리셋 버튼 (.btnreset)</span><div class="color-wrap"><div class="toggle" id="tg_btnReset"></div><input type="color" id="cp_btnReset" value="#2d7ee1"><input type="text" class="hex-input" id="hx_btnReset" value="#2d7ee1"></div></div>
+    <div class="row"><span class="row-label">게시판/우측 배경</span><div class="color-wrap"><div class="toggle" id="tg_boardBg"></div><input type="color" id="cp_boardBg" value="#ffffff"><input type="text" class="hex-input" id="hx_boardBg" value="#ffffff"></div></div>
+  </div>
+</div>
+
+<div class="panel" id="tab-bg">
+  <div class="css-hint">이미지를 특정 영역 배경으로 지정합니다. 누끼 PNG도 가능.</div>
+  <div id="bgList"></div>
+  <button class="add-bg-btn" id="addBgBtn">＋ 배경 이미지 추가</button>
+  <input type="file" id="bgFileInput" accept="image/*">
+</div>
+
+<div class="panel" id="tab-menu">
+  <div class="menu-sep">상단 GNB 네비</div>
+  <div class="menu-item"><span class="menu-icon">🏢</span><span class="menu-name">온나라 (LNB)</span><span class="menu-badge">#lnb</span><input type="checkbox" class="chk" id="mc_lnb" checked></div>
+  <div class="menu-item"><span class="menu-icon">🌐</span><span class="menu-name">온나라 GNB 영역</span><span class="menu-badge">.darkGnbWrap</span><input type="checkbox" class="chk" id="mc_gnbInner" checked></div>
+  <div class="menu-item"><span class="menu-icon">📬</span><span class="menu-name">결재대기함 영역</span><span class="menu-badge">.inner</span><input type="checkbox" class="chk" id="mc_result" checked></div>
+  <div class="menu-sep">메뉴 위젯</div>
+  <div class="menu-item"><span class="menu-icon">📧</span><span class="menu-name">메일</span><span class="menu-badge">.menu01</span><input type="checkbox" class="chk" id="mc_menu01" checked></div>
+  <div class="menu-item"><span class="menu-icon">⚙️</span><span class="menu-name">온-나라설정</span><span class="menu-badge">.menu02</span><input type="checkbox" class="chk" id="mc_menu02" checked></div>
+  <div class="menu-item"><span class="menu-icon">👤</span><span class="menu-name">e-사람</span><span class="menu-badge">.menu03</span><input type="checkbox" class="chk" id="mc_menu03" checked></div>
+  <div class="menu-item"><span class="menu-icon">📚</span><span class="menu-name">배우리/문자발송</span><span class="menu-badge">.menu04</span><input type="checkbox" class="chk" id="mc_menu04" checked></div>
+  <div class="menu-item"><span class="menu-icon">🤝</span><span class="menu-name">노사누리</span><span class="menu-badge">.menu05</span><input type="checkbox" class="chk" id="mc_menu05" checked></div>
+</div>
+
+<div class="panel" id="tab-css">
+  <div class="css-hint">직접 CSS 입력. <code>!important</code> 추천.<br>예: <code>.menu_infoArea { border-radius: 8px !important; }</code></div>
+  <textarea id="customCSS" placeholder="/* 여기에 CSS 입력 */"></textarea>
+</div>
+
+<div class="bot">
+  <button class="btn btn-apply" id="btnApply">✅ 포털에 적용</button>
+  <button class="btn btn-save" id="btnSave">💾 저장</button>
+  <button class="btn btn-reset" id="btnReset">🗑 초기화</button>
+  <span class="bot-msg" id="botMsg"></span>
+</div>
+
+<script src="popup.js"></script>
+</body>
+</html>
