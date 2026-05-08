@@ -80,6 +80,21 @@ function generateCSS(theme) {
   if (mc.gnbInner === false) css += `header nav .darkGnbWrap { display: none !important; }\n`;
   if (mc.result === false)   css += `header nav .inner:not(#lnb):not(.darkGnbWrap) { display: none !important; }\n`;
 
+  // ── 레이아웃 설정 ──
+  const lc = theme.layoutConfig || {};
+  if (lc.showHeader === false)   css += `header#header { display: none !important; }\n`;
+  if (lc.showFooter === false)   css += `footer#footer { display: none !important; }\n`;
+  if (lc.showMyLink === false)   css += `.myLink { display: none !important; }\n`;
+  if (lc.showDauriFaq === false) css += `.dauri_faq { display: none !important; }\n`;
+  if (lc.menuUlHidden) {
+    const s = [1,2,3,4,5].map(i => `.menu_infoArea div.menu0${i} ul`).join(', ');
+    css += `${s} { display: none !important; }\n`;
+  }
+  if (lc.menuAreaCentered) {
+    css += `.menu_infoArea { display: flex !important; justify-content: center !important; align-items: flex-start !important; flex-wrap: wrap !important; gap: 16px !important; background: transparent !important; border: none !important; box-shadow: none !important; padding: 16px 0 !important; width: 100% !important; }\n`;
+    css += `.menu_infoArea > div { float: none !important; width: auto !important; min-width: 160px !important; max-width: 240px !important; flex: 0 0 auto !important; }\n`;
+  }
+
   // ── 게시판 · 알림판 패널 ──
   const BOARD_SEL = {
     board_01: '.notice1.board_01',

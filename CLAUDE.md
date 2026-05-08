@@ -209,6 +209,14 @@ div.bbsCnR                             /* 본문 미리보기 (board_02) */
     "menu04": true,
     "menu05": true
   },
+  "layoutConfig": {
+    "showHeader":       true,
+    "showFooter":       true,
+    "showMyLink":       true,
+    "showDauriFaq":     true,
+    "menuAreaCentered": false,
+    "menuUlHidden":     false
+  },
   "boardPanels": {
     "board_01": { "hidden": false, "imageData": null, "mode": "overlay" },
     "board_02": { "hidden": false, "imageData": null, "mode": "overlay" },
@@ -219,6 +227,17 @@ div.bbsCnR                             /* 본문 미리보기 (board_02) */
   "customCSS": ""
 }
 ```
+
+### layoutConfig 옵션
+
+| 키 | 기본값 | 설명 |
+|----|--------|------|
+| `showHeader` | true | false → `header#header { display:none }` |
+| `showFooter` | true | false → `footer#footer { display:none }` |
+| `showMyLink` | true | false → `.myLink { display:none }` |
+| `showDauriFaq` | true | false → `.dauri_faq { display:none }` |
+| `menuAreaCentered` | false | true → `.menu_infoArea` flex 가운데 정렬, 박스 제거 |
+| `menuUlHidden` | false | true → 각 메뉴 위젯 내 `ul` 숨김 (h4 헤더만 표시) |
 
 ### boardPanels.mode 옵션
 

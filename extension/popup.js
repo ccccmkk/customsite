@@ -189,6 +189,16 @@ function renderBgList() {
 // ── 메뉴 체크박스 ──
 const MENU_KEYS = ['lnb','gnbInner','result','menu01','menu02','menu03','menu04','menu05'];
 
+// ── 레이아웃 설정 ──
+const LAYOUT_DEFAULTS = {
+  showHeader:       true,
+  showFooter:       true,
+  showMyLink:       true,
+  showDauriFaq:     true,
+  menuAreaCentered: false,
+  menuUlHidden:     false,
+};
+
 // ── 게시판 · 알림판 패널 ──
 const BOARD_PANEL_DEFS = [
   { key: 'board_01', label: '게시판① 정책/교육/일반공지', icon: '📋' },
@@ -293,10 +303,17 @@ function buildTheme() {
     if (el) menuConfig[k] = el.checked;
   });
 
+  const layoutConfig = {};
+  Object.keys(LAYOUT_DEFAULTS).forEach(k => {
+    const el = document.getElementById('lc_' + k);
+    if (el) layoutConfig[k] = el.checked;
+  });
+
   return {
     colors,
     backgrounds: bgCards.filter(c => c.imageData),
     menuConfig,
+    layoutConfig,
     boardPanels: boardPanelConfig,
     customCSS: document.getElementById('customCSS').value
   };
@@ -355,6 +372,21 @@ function generateCSS(theme) {
   if (mc.lnb === false)      css += `header nav #lnb { display: none !important; }\n`;
   if (mc.gnbInner === false) css += `header nav .darkGnbWrap { display: none !important; }\n`;
   if (mc.result === false)   css += `header nav .inner:not(#lnb):not(.darkGnbWrap) { display: none !important; }\n`;
+
+  // ── 레이아웃 설정 ──
+  const lc = theme.layoutConfig || {};
+  if (lc.showHeader === false)   css += `header#header { display: none !important; }\n`;
+  if (lc.showFooter === false)   css += `footer#footer { display: none !important; }\n`;
+  if (lc.showMyLink === false)   css += `.myLink { display: none !important; }\n`;
+  if (lc.showDauriFaq === false) css += `.dauri_faq { display: none !important; }\n`;
+  if (lc.menuUlHidden) {
+    const s = [1,2,3,4,5].map(i => `.menu_infoArea div.menu0${i} ul`).join(', ');
+    css += `${s} { display: none !important; }\n`;
+  }
+  if (lc.menuAreaCentered) {
+    css += `.menu_infoArea { display: flex !important; justify-content: center !important; align-items: flex-start !important; flex-wrap: wrap !important; gap: 16px !important; background: transparent !important; border: none !important; box-shadow: none !important; padding: 16px 0 !important; width: 100% !important; }\n`;
+    css += `.menu_infoArea > div { float: none !important; width: auto !important; min-width: 160px !important; max-width: 240px !important; flex: 0 0 auto !important; }\n`;
+  }
 
   const BOARD_SEL = {
     board_01: '.notice1.board_01',
@@ -508,6 +540,14 @@ chrome.storage.local.get('portalTheme', data => {
   MENU_KEYS.forEach(k => {
     const el = document.getElementById('mc_'+k);
     if (el) el.checked = mc[k] !== false;
+  });
+
+  // 레이아웃 복원
+  const lc = theme.layoutConfig || {};
+  Object.keys(LAYOUT_DEFAULTS).forEach(k => {
+    const el = document.getElementById('lc_' + k);
+    if (!el) return;
+    el.checked = lc[k] !== undefined ? lc[k] : LAYOUT_DEFAULTS[k];
   });
 
   // 커스텀 CSS 복원
