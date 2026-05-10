@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>포털 테마 비주얼 에디터</title>
+<style>
+:root{--bg:#f0f4f8;--sur:#fff;--sur2:#f8fafc;--sur3:#e2e8f0;--bdr:#d1d9e6;--acc:#3b82f6;--acc2:#ef4444;--txt:#1e293b;--txt2:#64748b;--mono:'Courier New',monospace}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,'Malgun Gothic',sans-serif;font-size:13px;display:flex;flex-direction:column}
+.topbar{height:42px;background:var(--sur);border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;padding:0 14px;flex-shrink:0}
+.topbar-logo{font-family:var(--mono);font-size:13px;font-weight:700;color:var(--acc)}
+.topbar-sub{font-size:10px;color:var(--txt2)}
+.tb-sp{flex:1}
+.tb-btn{height:28px;padding:0 12px;border:1px solid var(--bdr);border-radius:4px;background:var(--sur2);color:var(--txt);cursor:pointer;font-size:11px;font-family:inherit}
+.tb-btn.p{background:var(--acc);color:#fff;border-color:var(--acc)}
+.tb-btn:hover{opacity:.85}
+.main{flex:1;display:flex;overflow:hidden}
+.preview-area{flex:1;background:#dde3ee;display:flex;flex-direction:column;padding:10px;gap:8px;overflow:hidden;min-width:0}
+.preview-bar{display:flex;align-items:center;gap:8px;font-size:10px;color:var(--txt2);font-family:var(--mono);flex-shrink:0}
+#scale-val{color:var(--acc);font-weight:700}
+#sel-hint{color:#f59e0b;font-size:10px}
+.preview-wrap{flex:1;overflow:auto;padding:10px}
+#scale-wrap{overflow:hidden;flex-shrink:0}
+#ppc{width:1200px;transform-origin:top left}
+
+/* Portal mock base */
+#portal-preview{width:1200px;font-size:12px;line-height:1.4;background:#f0f2f5;font-family:'Malgun Gothic',sans-serif}
+#portal-preview *{box-sizing:border-box}
+#portal-preview a{text-decoration:none;color:inherit;cursor:pointer}
+#portal-preview ul{list-style:none}
+#portal-preview button{cursor:pointer;border:none;font-family:inherit}
+
+/* Selectable */
+.ps{cursor:pointer;transition:outline .1s}
+.ps:hover{outline:2px solid rgba(59,130,246,.35);outline-offset:-2px}
+.ps.sel{outline:2px solid #3b82f6!important;outline-offset:-2px}
+
+/* Header base */
+#portal-preview header#header{}
+#portal-preview header#header>div.inner{background:#1a3a6e;height:44px;display:flex;align-items:center;padding:0 16px;gap:12px}
+#portal-preview .logo-text{color:#fff;font-size:17px;font-weight:900;letter-spacing:.05em}
+#portal-preview .topNavi{margin-left:auto}
+#portal-preview .topNavi ul{display:flex;gap:6px;align-items:center}
+#portal-preview .topNavi li{font-size:11px;color:rgba(255,255,255,.85);padding:3px 8px;border-radius:3px;cursor:pointer;white-space:nowrap}
+#portal-preview .topNavi li:hover{background:rgba(255,255,255,.15)}
+#portal-preview .topNavi button{background:none;color:rgba(255,255,255,.8);font-size:12px}
+#portal-preview header nav{background:#0f2744}
+#portal-preview div#lnb>div.inner{display:flex;height:42px;align-items:center;padding:0 12px}
+#portal-preview ul.topmenu{display:flex;height:100%;align-items:center;gap:2px}
+#portal-preview ul.topmenu>li{padding:6px 14px;color:rgba(255,255,255,.85);font-size:12px;font-weight:600;cursor:pointer;border-radius:3px;white-space:nowrap}
+#portal-preview ul.topmenu>li.on,#portal-preview ul.topmenu>li:hover{background:rgba(255,255,255,.15);color:#fff}
+#portal-preview div.inner.darkGnbWrap{display:none}
+#portal-preview div.menu_allArea{display:none}
+
+/* con_01 */
+#portal-preview section.con_01{padding:12px 16px;display:flex;gap:10px;background:#f5f7f9}
+#portal-preview div.menu_infoArea{display:flex;gap:8px;flex:1;min-width:0}
+#portal-preview div.menu_infoArea>div{background:#fff;border:1px solid #dde3ea;border-radius:4px;flex:1;min-width:0;overflow:hidden}
+#portal-preview div.menu_infoArea>div h4{background:#3b5998;color:#fff;padding:6px 10px;font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:4px}
+#portal-preview div.menu_infoArea>div h4 a{color:inherit}
+#portal-preview .btnSmallA{background:#0a808f;color:#fff;border-radius:3px;padding:2px 7px;font-size:10px}
+#portal-preview .btnSmallA_01{background:#0a808f;color:#fff;border-radius:3px;padding:2px 7px;font-size:10px}
+#portal-preview .btnSmall{background:#435a7c;color:#fff;border-radius:3px;padding:2px 7px;font-size:10px}
+#portal-preview .btnreset{background:#2d7ee1;color:#fff;border-radius:3px;padding:2px 7px;font-size:10px}
+#portal-preview .btnAll{background:#3b82f6;color:#fff;border-radius:3px;padding:2px 7px;font-size:10px}
+#portal-preview div.menu_infoArea ul{padding:3px 0}
+#portal-preview div.menu_infoArea ul li{padding:3px 10px;font-size:10px;color:#444;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f5f7f9;gap:4px}
+#portal-preview div.menu_infoArea ul li:hover{background:#f8fafc}
+#portal-preview div.menuText{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#portal-preview div.menuRight{color:#888;font-size:10px;flex-shrink:0}
+#portal-preview div.menuRight span.on{color:#0a808f;font-weight:700}
+#portal-preview div.popzone{width:180px;background:#fff;border:1px solid #dde3ea;border-radius:4px;overflow:hidden;flex-shrink:0}
+#portal-preview div.popzone .popTitle{background:#1a3a6e;color:#fff;padding:6px 10px;font-size:11px;display:flex;justify-content:space-between;align-items:center}
+#portal-preview div.popzone .popTitle h5{font-size:11px}
+#portal-preview div.popzone .popBtn{display:flex;gap:3px}
+#portal-preview div.popzone .popBtn button{background:rgba(255,255,255,.2);color:#fff;border-radius:2px;padding:1px 5px;font-size:10px}
+#portal-preview div.popzone .popImg{padding:8px}
+#portal-preview div.popzone .popImg a{display:block;height:90px;background:linear-gradient(135deg,#e2e8f0,#cbd5e1);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#64748b}
+
+/* con_02 */
+#portal-preview section.con_02{display:flex;gap:10px;padding:0 16px 12px}
+#portal-preview div#noticeZone.boardArea{flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#portal-preview .notice1,.portal-preview .notice2{background:#fff;border:1px solid #dde3ea;border-radius:4px;overflow:hidden;position:relative}
+#portal-preview .notice1{background:#fff;border:1px solid #dde3ea;border-radius:4px;overflow:hidden;position:relative}
+#portal-preview .notice2{background:#fff;border:1px solid #dde3ea;border-radius:4px;overflow:hidden;position:relative}
+#portal-preview .board_title{background:#f8fafc;border-bottom:1px solid #e2e8f0}
+#portal-preview .board_title ul{display:flex;flex-wrap:nowrap;overflow:hidden}
+#portal-preview .board_title ul li{padding:6px 10px;font-size:10px;font-weight:600;color:#64748b;cursor:pointer;white-space:nowrap;border-right:1px solid #e2e8f0;flex-shrink:0}
+#portal-preview .board_title ul li.on,.portal-preview .board_title ul li:hover{color:#1a3a6e;background:#fff}
+#portal-preview .board_title ul li.more{margin-left:auto;border-right:none;color:var(--acc)}
+#portal-preview .boardTabLink{color:inherit}
+#portal-preview ul.bd_list{padding:3px 0}
+#portal-preview ul.bd_list>li{padding:3px 10px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #f8fafc;font-size:10px}
+#portal-preview ul.bd_list>li:hover{background:#f8fafc}
+#portal-preview span.list_txt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#334155}
+#portal-preview span.list_date{font-size:9px;color:#94a3b8;white-space:nowrap;flex-shrink:0}
+
+/* rightContents */
+#portal-preview div.rightContents{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
+#portal-preview div#aiFinderWidget{background:linear-gradient(135deg,#1a3a6e,#0f2744);border-radius:4px;padding:10px}
+#portal-preview div#aiFinderWidget .afw-head{color:rgba(255,255,255,.95);font-size:11px;font-weight:700;margin-bottom:7px}
+#portal-preview div#aiFinderWidget .afw-bar{display:flex;gap:4px}
+#portal-preview div#aiFinderWidget input{flex:1;height:26px;border-radius:4px;border:none;padding:0 8px;font-size:10px;font-family:inherit}
+#portal-preview .afw-chips{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap}
+#portal-preview .afw-chip{background:rgba(255,255,255,.2);color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;cursor:pointer}
+#portal-preview div.myLink{background:#fff;border:1px solid #dde3ea;border-radius:4px;padding:8px}
+#portal-preview div.myLink h5{font-size:11px;color:#1e293b;margin-bottom:6px;display:flex;align-items:center}
+#portal-preview div.myLink h5 a{margin-left:auto}
+#portal-preview div.myLink .link_area ul{display:flex;flex-wrap:wrap;gap:4px}
+#portal-preview div.myLink .link_area ul li{background:#f1f5f9;border-radius:3px;padding:3px 8px;font-size:10px;color:#475569;cursor:pointer}
+#portal-preview div.myLink .link_area ul li:hover{background:#e2e8f0}
+#portal-preview div.dauri_faq{background:#fff;border:1px solid #dde3ea;border-radius:4px;padding:8px}
+#portal-preview div.dauri_faq h5{font-size:10px;color:#475569;cursor:pointer;padding:4px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:4px}
+#portal-preview div.dauri_faq h5:hover{color:var(--acc)}
+#portal-preview .helpdesk_info{margin-top:6px;padding:5px 8px;background:#f8fafc;border-radius:3px;font-size:9px;color:#64748b;border:1px solid #e2e8f0}
+
+/* footer */
+#portal-preview footer#footer{background:#1a3a6e;color:rgba(255,255,255,.75);padding:10px 16px;font-size:10px}
+#portal-preview footer .bannerLink{border-bottom:1px solid rgba(255,255,255,.15);padding-bottom:6px;margin-bottom:6px}
+#portal-preview footer .footer_nav ul{display:flex;gap:14px}
+#portal-preview footer .footer_nav ul li a{color:rgba(255,255,255,.7)}
+#portal-preview footer .footer_nav ul li a:hover{color:#fff}
+#portal-preview footer .footer_info{display:flex;gap:16px;align-items:center;font-size:10px}
+
+/* ── CTRL PANEL ── */
+.ctrl{width:360px;background:var(--sur);border-left:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0}
+.ctrl-tabs{display:flex;flex-wrap:wrap;background:var(--bg);border-bottom:1px solid var(--bdr);flex-shrink:0}
+.ctab{padding:7px 4px;font-size:11px;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;flex:1;text-align:center;white-space:nowrap}
+.ctab.active{color:var(--acc);border-bottom-color:var(--acc);background:var(--sur)}
+.ctrl-scroll{flex:1;overflow-y:auto;padding:12px}
+.ctrl-scroll::-webkit-scrollbar{width:3px}
+.ctrl-scroll::-webkit-scrollbar-thumb{background:var(--sur3)}
+.sec-hd{font-size:9px;font-weight:700;color:var(--txt2);letter-spacing:.12em;text-transform:uppercase;font-family:var(--mono);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--bdr)}
+.ctrl-group{margin-bottom:14px}
+.color-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.color-label{font-size:11px;color:var(--txt2);flex:1;display:flex;align-items:center;gap:4px;cursor:pointer}
+input[type=color]{width:32px;height:24px;border:1px solid var(--bdr);border-radius:3px;cursor:pointer;padding:1px;flex-shrink:0}
+input[type=checkbox]{accent-color:var(--acc);cursor:pointer}
+.hex-inp{width:68px;background:var(--sur2);border:1px solid var(--bdr);border-radius:3px;padding:3px 5px;font-size:11px;font-family:var(--mono);color:var(--txt);outline:none;flex-shrink:0}
+.hex-inp:focus{border-color:var(--acc)}
+.bg-card{background:var(--sur2);border:1px solid var(--bdr);border-radius:5px;padding:9px;margin-bottom:8px}
+.bg-card-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.bg-card-title{font-size:11px;font-weight:600}
+.bg-rm{background:none;border:none;color:var(--acc2);cursor:pointer;font-size:14px;padding:0 2px}
+.ctrl-sel{width:100%;background:var(--sur);border:1px solid var(--bdr);border-radius:3px;padding:4px;font-size:11px;font-family:inherit;color:var(--txt);margin-bottom:5px;outline:none}
+.ctrl-sel:focus{border-color:var(--acc)}
+.bg-upload{width:100%;height:28px;background:var(--sur);border:1px dashed var(--bdr);border-radius:3px;cursor:pointer;font-size:11px;color:var(--txt2);display:flex;align-items:center;justify-content:center;gap:4px;margin-bottom:5px;transition:all .1s}
+.bg-upload:hover{border-color:var(--acc);color:var(--acc)}
+.bg-thumb{width:100%;height:56px;object-fit:cover;border-radius:3px;margin-bottom:5px}
+.slider-row{display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.slider-label{font-size:10px;color:var(--txt2);width:44px;flex-shrink:0}
+input[type=range]{flex:1;height:3px;-webkit-appearance:none;background:var(--sur3);border-radius:2px;outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:11px;height:11px;border-radius:50%;background:var(--acc);cursor:pointer}
+.slider-val{font-size:10px;color:var(--acc);font-family:var(--mono);min-width:36px;text-align:right;flex-shrink:0}
+.add-bg-btn{width:100%;height:32px;border:1px dashed var(--bdr);background:var(--sur2);border-radius:4px;cursor:pointer;font-size:11px;color:var(--txt2);display:flex;align-items:center;justify-content:center;gap:4px;transition:all .1s}
+.add-bg-btn:hover{border-color:var(--acc);color:var(--acc)}
+.tog-list{display:flex;flex-direction:column;gap:7px}
+.tog-row{display:flex;align-items:center;gap:8px}
+.tog-label{flex:1;font-size:11px;color:var(--txt2)}
+.tog-sw{position:relative;width:34px;height:18px;flex-shrink:0;display:inline-block}
+.tog-sw input{opacity:0;width:0;height:0;position:absolute}
+.tog-sw .sl{position:absolute;inset:0;background:#cbd5e1;border-radius:18px;cursor:pointer;transition:.2s}
+.tog-sw .sl::before{content:'';position:absolute;width:12px;height:12px;left:3px;top:3px;background:#fff;border-radius:50%;transition:.2s}
+.tog-sw input:checked+.sl{background:var(--acc)}
+.tog-sw input:checked+.sl::before{transform:translateX(16px)}
+.board-item{background:var(--sur2);border:1px solid var(--bdr);border-radius:4px;padding:8px;margin-bottom:6px}
+.board-item-hd{font-size:11px;font-weight:600;margin-bottom:6px}
+textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:1px solid var(--bdr);border-radius:4px;padding:8px;font-family:var(--mono);font-size:11px;resize:vertical;outline:none}
+.hint-text{font-size:10px;color:var(--txt2);margin-bottom:8px;line-height:1.5}
+.ctrl-inp{width:100%;background:var(--sur2);border:1px solid var(--bdr);border-radius:3px;padding:4px 7px;font-size:11px;color:var(--txt);outline:none;font-family:inherit;margin-bottom:4px}
+.ctrl-inp:focus{border-color:var(--acc)}
+.mt8{margin-top:8px}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <span class="topbar-logo">PORTAL THEME EDITOR</span>
+  <span class="topbar-sub">dauri.moel.go.kr 비주얼 에디터</span>
+  <div class="tb-sp"></div>
+  <button class="tb-btn" onclick="doImport()">📂 JSON 불러오기</button>
+  <button class="tb-btn" onclick="doReset()">↺ 초기화</button>
+  <button class="tb-btn p" onclick="doExport()">⬇ portalTheme.json 저장</button>
+</div>
+
+<div class="main">
+  <!-- PREVIEW -->
+  <div class="preview-area">
+    <div class="preview-bar">
+      LIVE PREVIEW &nbsp;·&nbsp; 클릭으로 영역 선택
+      &nbsp;<span id="scale-val">-</span>
+      &nbsp;<span id="sel-hint"></span>
+    </div>
+    <div class="preview-wrap" id="previewWrap">
+      <div id="scale-wrap">
+        <div id="ppc">
+
+          <div id="portal-preview">
+          <div id="wrap">
+
+          <!-- ── HEADER ── -->
+          <header id="header" class="ps" data-r="header" onclick="sel(event,'header')">
+            <div class="inner ps" data-r="header-inner" onclick="sel(event,'header-inner')">
+              <h1 class="logo"><span class="logo-text">다우리</span></h1>
+              <div class="topNavi">
+                <ul class="gnb">
+                  <li class="workArea">🕐 출퇴근</li>
+                  <li class="color1">홍길동 (gildong)</li>
+                  <li><a href="#">로그아웃</a></li>
+                  <li><a href="#">개인설정</a></li>
+                  <li class="themeToggle"><button id="themeToggleBtn">🌙</button></li>
+                  <li class="color2">소속기관관리자</li>
+                  <li class="color3">직원검색</li>
+                  <li class="color4"><a href="#">게시판검색</a></li>
+                  <li id="afwHeaderBar"><a href="#">AI직원검색</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="cr"></div>
+            <nav class="ps" data-r="header-nav" onclick="sel(event,'header-nav')">
+              <div id="lnb"><div class="inner"><ul class="topmenu">
+                <li class="on"><a href="#">온나라</a></li>
+                <li><a href="#">관리</a></li>
+                <li><a href="#">알림</a></li>
+                <li><a href="#">소통·지원</a></li>
+                <li><a href="#">온나라지식</a></li>
+              </ul></div></div>
+              <div class="inner darkGnbWrap"><ul class="darkGnbList">
+                <li class="darkGnbItem">온나라</li>
+              </ul></div>
+              <div class="inner"><div class="menu_allArea"><ul class="menu_allList">
+                <li id="snb1" class="snb f_list">서브메뉴 영역</li>
+              </ul></div></div>
+            </nav>
+          </header>
+
+          <!-- ── CON_01 ── -->
+          <section class="con_01">
+            <div class="menu_infoArea ps" data-r="menu-area" onclick="sel(event,'menu-area')">
+
+              <div class="menu01 ps" data-r="menu01" onclick="sel(event,'menu01')">
+                <h4><a href="#">메일</a><button class="btnSmallA">go</button></h4>
+                <ul>
+                  <li><div class="menuText"><a href="#">[받은메일] 읽지않은 메일</a></div><div class="menuRight">3</div></li>
+                  <li><div class="menuText"><a href="#">[보낸메일] 최근 발송</a></div><div class="menuRight">1</div></li>
+                  <li><div class="menuText"><a href="#">[임시저장] 작성중</a></div><div class="menuRight">0</div></li>
+                  <li><div class="menuText"><a href="#">새 메일 작성</a></div><div class="menuRight"><button class="btnSmallA">작성</button></div></li>
+                </ul>
+              </div>
+
+              <div class="menu02 ps" data-r="menu02" onclick="sel(event,'menu02')">
+                <h4><a href="#">온-나라</a><button class="btnSmallA_01">설정</button></h4>
+                <ul id="indexBms">
+                  <li><div class="menuText"><a href="#">결재대기</a></div><div class="menuRight"><span class="on">5</span></div></li>
+                  <li><div class="menuText"><a href="#">기안문서</a></div><div class="menuRight">2</div></li>
+                  <li><div class="menuText"><a href="#">반송문서</a></div><div class="menuRight">0</div></li>
+                  <li><div class="menuText"><a href="#">전자문서함</a></div><div class="menuRight"><button class="btnSmall">열기</button></div></li>
+                </ul>
+              </div>
+
+              <div class="menu03 ps" data-r="menu03" onclick="sel(event,'menu03')">
+                <h4><a href="#">e-사람</a></h4>
+                <ul>
+                  <li><div class="menuText"><a href="#">근태현황</a></div><div class="menuRight">-</div></li>
+                  <li><div class="menuText"><a href="#">휴가잔여</a></div><div class="menuRight">15일</div></li>
+                  <li><div class="menuText"><a href="#">급여명세</a></div><div class="menuRight"><button class="btnSmall">조회</button></div></li>
+                  <li><div class="menuText"><a href="#">인사발령</a></div><div class="menuRight">-</div></li>
+                </ul>
+              </div>
+
+              <div class="menu04 ps" data-r="menu04" onclick="sel(event,'menu04')">
+                <h4>/<a href="#">배우리</a>/<a href="#">문자발송</a></h4>
+                <ul>
+                  <li><div class="menuText"><a href="#">학습진도</a></div><div class="menuRight">70%</div></li>
+                  <li><div class="menuText"><a href="#">신청강좌</a></div><div class="menuRight">2</div></li>
+                  <li><div class="menuText"><a href="#">문자 보내기</a></div><div class="menuRight"><button class="btnSmall">go</button></div></li>
+                  <li><div class="menuText"><a href="#">수료증 발급</a></div><div class="menuRight">-</div></li>
+                </ul>
+              </div>
+
+              <div class="menu05 ps" data-r="menu05" onclick="sel(event,'menu05')">
+                <h4><a href="#">노사누리</a></h4>
+                <ul>
+                  <li><div class="menuText"><a href="#">공지사항</a></div><div class="menuRight">NEW</div></li>
+                  <li><div class="menuText"><a href="#">복지포인트</a></div><div class="menuRight">120P</div></li>
+                  <li><div class="menuText"><a href="#">자주쓰는메뉴</a></div><div class="menuRight">-</div></li>
+                  <li><div class="menuText"><a href="#">복지몰 바로가기</a></div><div class="menuRight"><button class="btnSmall">이동</button></div></li>
+                </ul>
+              </div>
+
+            </div><!-- .menu_infoArea -->
+
+            <div class="popzone ps" data-r="popzone" onclick="sel(event,'popzone')">
+              <div class="popTitle">
+                <h5>알림판</h5>
+                <div class="popBtn">
+                  <button class="btnSmall">◀</button>
+                  <button class="btnSmall">▶</button>
+                </div>
+              </div>
+              <div id="issueList" class="popImg">
+                <a href="#"><div style="height:100px;background:linear-gradient(135deg,#e2e8f0,#cbd5e1);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#64748b">알림판 이미지</div></a>
+              </div>
+            </div>
+          </section>
+
+          <!-- ── CON_02 ── -->
+          <section class="con_02">
+            <div id="noticeZone" class="boardArea ps" data-r="board-area" onclick="sel(event,'board-area')">
+
+              <div class="notice1 board_01 ps" data-r="board_01" onclick="sel(event,'board_01')">
+                <div class="board_title"><ul>
+                  <li class="noticeTab_1 on"><a class="boardTabLink" href="#">정책공지</a></li>
+                  <li class="noticeTab_1"><a class="boardTabLink" href="#">교육공지</a></li>
+                  <li class="noticeTab_1"><a class="boardTabLink" href="#">일반공지</a></li>
+                  <li class="noticeTab_1"><a class="boardTabLink" href="#">인사(6급↓)</a></li>
+                  <li class="more"><a href="#" class="boardTabMore">더보기+</a></li>
+                </ul></div>
+                <ul class="bd_list">
+                  <li><span class="list_txt"><a href="#">2026년 고용노동부 주요정책 안내</a></span><span class="list_date">05-10</span></li>
+                  <li><span class="list_txt"><a href="#">직원 교육훈련 신청 안내</a></span><span class="list_date">05-09</span></li>
+                  <li><span class="list_txt"><a href="#">하반기 인사이동 계획 공고</a></span><span class="list_date">05-08</span></li>
+                  <li><span class="list_txt"><a href="#">개인정보 보호 교육 안내</a></span><span class="list_date">05-07</span></li>
+                  <li><span class="list_txt"><a href="#">청사 방역 및 위생 관리 안내</a></span><span class="list_date">05-06</span></li>
+                </ul>
+              </div>
+
+              <div class="notice1 board_02 ps" data-r="board_02" onclick="sel(event,'board_02')">
+                <div class="board_title"><ul>
+                  <li class="on"><a class="boardTabLink" href="#">오늘의 보도자료</a></li>
+                  <li><a class="boardTabLink" href="#">보도·설명자료</a></li>
+                  <li><a class="boardTabLink" href="#">홍보물창고</a></li>
+                  <li class="more"><a href="#">더보기+</a></li>
+                </ul></div>
+                <ul class="bd_list">
+                  <li><span class="list_txt"><a href="#">고용률 통계 보도자료 (2026.05)</a></span><span class="list_date">05-10</span></li>
+                  <li><span class="list_txt"><a href="#">최저임금 설명자료</a></span><span class="list_date">05-09</span></li>
+                  <li><span class="list_txt"><a href="#">홍보물 제작 가이드라인</a></span><span class="list_date">05-07</span></li>
+                  <li><span class="list_txt"><a href="#">노동시장 동향 월간 브리핑</a></span><span class="list_date">05-06</span></li>
+                  <li><span class="list_txt"><a href="#">산재보험 개선안 보도 설명</a></span><span class="list_date">05-05</span></li>
+                </ul>
+              </div>
+
+              <div class="notice2 board_03 ps" data-r="board_03" onclick="sel(event,'board_03')">
+                <div class="board_title"><ul>
+                  <li class="on"><a class="boardTabLink" href="#">우리부소식</a></li>
+                  <li><a class="boardTabLink" href="#">서울청소식</a></li>
+                  <li><a class="boardTabLink" href="#">지식SOS</a></li>
+                  <li><a class="boardTabLink" href="#">재난안전</a></li>
+                  <li class="more"><a href="#">더보기+</a></li>
+                </ul></div>
+                <ul class="bd_list">
+                  <li><span class="list_txt"><a href="#">부내 행사일정 안내</a></span><span class="list_date">05-10</span></li>
+                  <li><span class="list_txt"><a href="#">서울청 회의 결과 공유</a></span><span class="list_date">05-08</span></li>
+                  <li><span class="list_txt"><a href="#">지식공유 SOS 답변</a></span><span class="list_date">05-07</span></li>
+                  <li><span class="list_txt"><a href="#">재난대응 훈련 일정</a></span><span class="list_date">05-06</span></li>
+                  <li><span class="list_txt"><a href="#">청사 안전점검 결과</a></span><span class="list_date">05-05</span></li>
+                </ul>
+              </div>
+
+              <div class="notice2 board_04 ps" data-r="board_04" onclick="sel(event,'board_04')">
+                <div class="board_title"><ul>
+                  <li class="on"><a class="boardTabLink" href="#">업무노하우</a></li>
+                  <li><a class="boardTabLink" href="#">장터마당</a></li>
+                  <li><a class="boardTabLink" href="#">경조사</a></li>
+                  <li><a class="boardTabLink" href="#">백인백색</a></li>
+                  <li class="more"><a href="#">더보기+</a></li>
+                </ul></div>
+                <ul class="bd_list">
+                  <li><span class="list_txt"><a href="#">엑셀 매크로 활용 노하우</a></span><span class="list_date">05-09</span></li>
+                  <li><span class="list_txt"><a href="#">사무용품 공동구매</a></span><span class="list_date">05-08</span></li>
+                  <li><span class="list_txt"><a href="#">김○○ 결혼 경조사 안내</a></span><span class="list_date">05-07</span></li>
+                  <li><span class="list_txt"><a href="#">업무 자동화 팁 공유</a></span><span class="list_date">05-06</span></li>
+                  <li><span class="list_txt"><a href="#">나만의 일처리 방법</a></span><span class="list_date">05-05</span></li>
+                </ul>
+              </div>
+
+            </div><!-- #noticeZone -->
+
+            <div class="rightContents ps" data-r="right" onclick="sel(event,'right')">
+              <div id="aiFinderWidget" class="ai-finder-widget">
+                <div class="afw-head">✦ AI 직원 검색</div>
+                <div class="afw-body"><div class="afw-bar">
+                  <input id="afwInput" placeholder="이름 또는 소속으로 검색...">
+                  <button id="afwBtn" class="btnSmallA">검색</button>
+                </div></div>
+                <div class="afw-chips">
+                  <span class="afw-chip">홍길동</span>
+                  <span class="afw-chip">인사과</span>
+                  <span class="afw-chip">서울청</span>
+                </div>
+              </div>
+              <div class="myLink ps" data-r="mylink" onclick="sel(event,'mylink')">
+                <h5>나의 업무링크 <a href="#" class="btnAll">전체</a></h5>
+                <div id="indexJoblink" class="link_area"><ul>
+                  <li><a href="#">📋 결재함</a></li>
+                  <li><a href="#">📧 메일</a></li>
+                  <li><a href="#">📅 일정</a></li>
+                  <li><a href="#">📊 통계</a></li>
+                  <li><a href="#">🗂 문서함</a></li>
+                  <li><a href="#">🔔 알림</a></li>
+                  <li><a href="#">📁 자료실</a></li>
+                  <li><a href="#">🔍 검색</a></li>
+                </ul></div>
+              </div>
+              <div class="dauri_faq ps" data-r="faq" onclick="sel(event,'faq')">
+                <h5 class="dauri_faq_link_l"><a href="#">📌 인사</a></h5>
+                <h5 class="dauri_faq_link_r"><a href="#">📰 언론스크랩</a></h5>
+                <h5 class="dauri_faq_link_l"><a href="#">📂 업무자료실</a></h5>
+                <h5 class="dauri_faq_link_r"><a href="#">💬 소통광장</a></h5>
+                <div id="helpdeskInfo" class="helpdesk_info">
+                  헬프데스크: 02-2110-0000 | 평일 09:00~18:00
+                </div>
+              </div>
+            </div><!-- .rightContents -->
+
+          </section><!-- .con_02 -->
+
+          <!-- ── FOOTER ── -->
+          <footer id="footer" class="ps" data-r="footer" onclick="sel(event,'footer')">
+            <div class="bannerLink"><div class="inner">
+              <div class="footer_nav"><ul>
+                <li><a href="#">나의게시판설정</a></li>
+                <li><a href="#">G드라이브</a></li>
+                <li><a href="#">통합검색</a></li>
+                <li><a href="#">사이트맵</a></li>
+              </ul></div>
+              <div class="footer_nav1" style="font-size:9px;color:rgba(255,255,255,.5);margin-top:4px">IP: 10.0.0.1 | 최종접속: 2026-05-10 09:00</div>
+            </div></div>
+            <div class="inner"><div class="footer_info">
+              <span>고용노동부 다우리 포털</span>
+              <span>Copyright © Ministry of Employment and Labor. All rights reserved.</span>
+            </div></div>
+          </footer>
+
+          </div><!-- #wrap -->
+          </div><!-- #portal-preview -->
+
+        </div><!-- #ppc -->
+      </div><!-- #scale-wrap -->
+    </div><!-- .preview-wrap -->
+  </div><!-- .preview-area -->
+
+  <!-- CTRL PANEL -->
+  <div class="ctrl">
+    <div class="ctrl-tabs">
+      <div class="ctab active" data-tab="colors" onclick="switchTab('colors')">🎨 색상</div>
+      <div class="ctab" data-tab="bg" onclick="switchTab('bg')">🖼 배경</div>
+      <div class="ctab" data-tab="menu" onclick="switchTab('menu')">☰ 메뉴</div>
+      <div class="ctab" data-tab="layout" onclick="switchTab('layout')">⊞ 레이아웃</div>
+      <div class="ctab" data-tab="board" onclick="switchTab('board')">📋 게시판</div>
+      <div class="ctab" data-tab="css" onclick="switchTab('css')">{ } CSS</div>
+    </div>
+    <div class="ctrl-scroll" id="ctrl-scroll"></div>
+  </div>
+</div>
+
+<input type="file" id="bgFileInput" accept="image/*" style="display:none">
+<input type="file" id="jsonImportInput" accept=".json" style="display:none" onchange="handleJSONImport(event)">
+<style id="preview-theme"></style>
+
+<script>
+// ══════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════
+const DEF = () => ({
+  colors:{
+    headerBg:'#1a3a6e', gnbBg:'#0f2744', gnbText:'#ffffff',
+    widgetHeaderBg:'#3b5998', widgetHeaderText:'#ffffff',
+    menuHdBg:'#f1f1f1', menuHdText:'#333333', menuText:'#444444',
+    accent:'#0a808f', btnDefault:'#435a7c', btnReset:'#2d7ee1', boardBg:'#ffffff',
+    enabled:{
+      headerBg:true, gnbBg:true, gnbText:false,
+      widgetHeaderBg:false, widgetHeaderText:false,
+      menuHd:false, menuText:false, accent:false,
+      btnDefault:false, btnReset:false, boardBg:false
+    }
+  },
+  backgrounds:[],
+  menuConfig:{lnb:true,gnbInner:true,result:true,menu01:true,menu02:true,menu03:true,menu04:true,menu05:true},
+  layoutConfig:{showHeader:true,showFooter:true,showMyLink:true,showDauriFaq:true,menuAreaCentered:false,menuUlHidden:false},
+  boardPanels:{
+    board_01:{hidden:false,imageData:null,mode:'overlay'},
+    board_02:{hidden:false,imageData:null,mode:'overlay'},
+    board_03:{hidden:false,imageData:null,mode:'overlay'},
+    board_04:{hidden:false,imageData:null,mode:'overlay'},
+    popzone: {hidden:false,imageData:null,mode:'overlay'}
+  },
+  customCSS:''
+});
+
+let theme = DEF();
+let currentTab = 'colors';
+let bgEditIdx = null;
+
+// ══════════════════════════════════════
+//  GENERATE CSS (exact match to extension)
+// ══════════════════════════════════════
+function generateCSS(t) {
+  if (!t) return '';
+  let css = '';
+  const c = t.colors || {}, en = c.enabled || {};
+
+  if (en.headerBg && c.headerBg)
+    css += `header { background-color: ${c.headerBg} !important; }\n`;
+  if (en.gnbBg && c.gnbBg)
+    css += `header nav, header nav .inner, header nav #lnb, header nav .darkGnbWrap { background-color: ${c.gnbBg} !important; }\n`;
+  if (en.gnbText && c.gnbText)
+    css += `header nav a, header nav span, header nav li { color: ${c.gnbText} !important; }\n`;
+  if (en.widgetHeaderBg && c.widgetHeaderBg) {
+    const s = [1,2,3,4,5].map(i=>`.menu_infoArea div.menu0${i} h4`).join(',');
+    css += `${s} { background-color: ${c.widgetHeaderBg} !important; background-image: none !important; }\n`;
+  }
+  if (en.widgetHeaderText && c.widgetHeaderText) {
+    const s = [1,2,3,4,5].map(i=>`.menu_infoArea div.menu0${i} h4`).join(',');
+    css += `${s} { color: ${c.widgetHeaderText} !important; }\n`;
+  }
+  if (en.menuHd && c.menuHdBg) {
+    const s = [1,2,3,4,5].map(i=>`.menu_infoArea div.menu0${i} h4`).join(',');
+    css += `${s} { background-color: ${c.menuHdBg} !important; }\n`;
+  }
+  if (en.menuHd && c.menuHdText) {
+    const s = [1,2,3,4,5].map(i=>`.menu_infoArea div.menu0${i} h4`).join(',');
+    css += `${s} { color: ${c.menuHdText} !important; }\n`;
+  }
+  if (en.menuText && c.menuText)
+    css += `.menu_infoArea div.menuText, .menu_infoArea div.menuRight { color: ${c.menuText} !important; }\n`;
+  if (en.accent && c.accent) {
+    css += `.btnSmallA, .btnAll, .btnSmallA_01 { background-color: ${c.accent} !important; }\n`;
+    const s = [1,2,3,4,5].map(i=>`.menu_infoArea div.menu0${i} ul li div.menuRight span.on`).join(',');
+    css += `${s} { color: ${c.accent} !important; }\n`;
+  }
+  if (en.btnDefault && c.btnDefault) css += `.btnSmall { background-color: ${c.btnDefault} !important; }\n`;
+  if (en.btnReset && c.btnReset) css += `.btnreset { background-color: ${c.btnReset} !important; }\n`;
+  if (en.boardBg && c.boardBg) css += `.boardArea, .rightContents { background-color: ${c.boardBg} !important; }\n`;
+
+  (t.backgrounds || []).forEach(bg => {
+    const sel = bg.selector === '__custom__' ? (bg.customSel || '') : bg.selector;
+    if (!sel || !bg.imageData) return;
+    const ov = (bg.overlay || 0).toFixed(2);
+    css += `${sel} { background: linear-gradient(rgba(0,0,0,${ov}),rgba(0,0,0,${ov})), url("${bg.imageData}") ${bg.position||'center'}/${bg.size||'cover'} ${bg.repeat||'no-repeat'} !important; }\n`;
+  });
+
+  const mc = t.menuConfig || {};
+  ['menu01','menu02','menu03','menu04','menu05'].forEach(m => {
+    if (mc[m] === false) css += `.menu_infoArea div.${m} { display: none !important; }\n`;
+  });
+  if (mc.lnb === false)      css += `header nav #lnb { display: none !important; }\n`;
+  if (mc.gnbInner === false) css += `header nav .darkGnbWrap { display: none !important; }\n`;
+  if (mc.result === false)   css += `header nav .inner:not(#lnb):not(.darkGnbWrap) { display: none !important; }\n`;
+
+  const lc = t.layoutConfig || {};
+  if (lc.showHeader === false)   css += `header#header { display: none !important; }\n`;
+  if (lc.showFooter === false)   css += `footer#footer { display: none !important; }\n`;
+  if (lc.showMyLink === false)   css += `.myLink { display: none !important; }\n`;
+  if (lc.showDauriFaq === false) css += `.dauri_faq { display: none !important; }\n`;
+  if (lc.menuUlHidden) {
+    const s = [1,2,3,4,5].map(i=>`.menu_infoArea div.menu0${i} ul`).join(',');
+    css += `${s} { display: none !important; }\n`;
+  }
+  if (lc.menuAreaCentered) {
+    css += `.menu_infoArea { display: flex !important; justify-content: center !important; flex-wrap: wrap !important; gap: 16px !important; }\n`;
+    css += `.menu_infoArea > div { float: none !important; width: auto !important; min-width: 160px !important; max-width: 220px !important; }\n`;
+  }
+
+  const BSEL = {board_01:'.notice1.board_01',board_02:'.notice1.board_02',board_03:'.notice2.board_03',board_04:'.notice2.board_04',popzone:'div.popzone'};
+  const bp = t.boardPanels || {};
+  Object.entries(BSEL).forEach(([key, sel]) => {
+    const cfg = bp[key] || {};
+    if (cfg.hidden) {
+      css += `${sel} { display: none !important; }\n`;
+    } else if (cfg.imageData) {
+      css += `${sel} { position: relative !important; overflow: hidden !important; }\n`;
+      if (cfg.mode === 'cover')
+        css += `${sel}::after { content:'' !important; position:absolute !important; inset:0 !important; background: white url("${cfg.imageData}") center/contain no-repeat !important; z-index:100 !important; }\n`;
+      else
+        css += `${sel}::after { content:'' !important; position:absolute !important; inset:0 !important; background: url("${cfg.imageData}") center/contain no-repeat !important; z-index:100 !important; pointer-events:none !important; }\n`;
+    }
+  });
+
+  if (t.customCSS?.trim()) css += '\n' + t.customCSS + '\n';
+  return css;
+}
+
+// ══════════════════════════════════════
+//  APPLY TO PREVIEW (prefix selectors)
+// ══════════════════════════════════════
+function prefixCSS(css) {
+  const P = '#portal-preview ';
+  // Simple rule-by-rule prefix; works for our flat CSS (no @media, no nesting)
+  return css.replace(/([^{}/][^{]*)\{([^}]*)\}/g, (match, sel, body) => {
+    const prefixed = sel.split(',').map(s => {
+      s = s.trim(); if (!s) return '';
+      // 'body' or 'body ...' → remap to #portal-preview
+      if (s === 'body') return '#portal-preview';
+      if (s.startsWith('body ')) return '#portal-preview ' + s.slice(5);
+      return P + s;
+    }).filter(Boolean).join(', ');
+    return prefixed ? `${prefixed} { ${body} }` : '';
+  });
+}
+
+function applyTheme() {
+  const raw = generateCSS(theme);
+  document.getElementById('preview-theme').textContent = prefixCSS(raw);
+}
+
+// ══════════════════════════════════════
+//  REGION SELECTION
+// ══════════════════════════════════════
+const RHINTS = {
+  'header':'헤더 전체 → 색상탭: 헤더 배경',
+  'header-inner':'헤더 상단 (로고+유저메뉴) → 색상탭: 헤더 배경색',
+  'header-nav':'GNB 네비 → 색상탭: GNB 배경/텍스트',
+  'menu-area':'메뉴 위젯 전체 → 색상탭/배경탭',
+  'menu01':'메일 위젯 → 메뉴탭에서 표시/숨김',
+  'menu02':'온나라 위젯 → 메뉴탭에서 표시/숨김',
+  'menu03':'e-사람 위젯 → 메뉴탭에서 표시/숨김',
+  'menu04':'배우리/문자 위젯 → 메뉴탭에서 표시/숨김',
+  'menu05':'노사누리 위젯 → 메뉴탭에서 표시/숨김',
+  'popzone':'알림판 → 게시판탭에서 이미지/숨김',
+  'board-area':'게시판 전체 → 색상탭: 게시판 배경',
+  'board_01':'게시판① → 게시판탭',
+  'board_02':'게시판② → 게시판탭',
+  'board_03':'게시판③ → 게시판탭',
+  'board_04':'게시판④ → 게시판탭',
+  'right':'우측 전체 → 레이아웃탭',
+  'mylink':'나의 업무링크 → 레이아웃탭',
+  'faq':'빠른링크/헬프데스크 → 레이아웃탭',
+  'footer':'푸터 → 레이아웃탭'
+};
+const RTAB = {
+  'header':'colors','header-inner':'colors','header-nav':'colors',
+  'menu-area':'colors','menu01':'menu','menu02':'menu','menu03':'menu','menu04':'menu','menu05':'menu',
+  'popzone':'board','board-area':'colors','board_01':'board','board_02':'board','board_03':'board','board_04':'board',
+  'right':'layout','mylink':'layout','faq':'layout','footer':'layout'
+};
+
+function sel(e, rid) {
+  e.stopPropagation();
+  document.querySelectorAll('.ps').forEach(el => el.classList.remove('sel'));
+  e.currentTarget.classList.add('sel');
+  document.getElementById('sel-hint').textContent = '▶ ' + (RHINTS[rid] || '');
+  switchTab(RTAB[rid] || 'colors');
+}
+
+// ══════════════════════════════════════
+//  TABS
+// ══════════════════════════════════════
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.ctab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  renderCtrl();
+}
+
+function renderCtrl() {
+  const s = document.getElementById('ctrl-scroll');
+  s.innerHTML = '';
+  if (currentTab === 'colors') renderColors(s);
+  else if (currentTab === 'bg') renderBg(s);
+  else if (currentTab === 'menu') renderMenu(s);
+  else if (currentTab === 'layout') renderLayout(s);
+  else if (currentTab === 'board') renderBoard(s);
+  else renderCSS(s);
+}
+
+// ══════════════════════════════════════
+//  COLORS
+// ══════════════════════════════════════
+const CDEFS = [
+  {g:'헤더', key:'headerBg',          en:'headerBg',        label:'헤더 배경색'},
+  {g:'헤더', key:'gnbBg',             en:'gnbBg',           label:'GNB 배경색'},
+  {g:'헤더', key:'gnbText',           en:'gnbText',         label:'GNB 텍스트색'},
+  {g:'메뉴 위젯', key:'widgetHeaderBg', en:'widgetHeaderBg', label:'위젯 h4 배경'},
+  {g:'메뉴 위젯', key:'widgetHeaderText',en:'widgetHeaderText',label:'위젯 h4 텍스트'},
+  {g:'메뉴 위젯', key:'menuHdBg',      en:'menuHd',          label:'메뉴 헤더 배경 (menuHd)'},
+  {g:'메뉴 위젯', key:'menuHdText',    en:'menuHd',          label:'메뉴 헤더 텍스트 (menuHd)'},
+  {g:'메뉴 위젯', key:'menuText',      en:'menuText',        label:'메뉴 항목 텍스트'},
+  {g:'버튼', key:'accent',            en:'accent',          label:'강조색 (go 버튼 등)'},
+  {g:'버튼', key:'btnDefault',        en:'btnDefault',      label:'기본 버튼색 (.btnSmall)'},
+  {g:'버튼', key:'btnReset',          en:'btnReset',        label:'리셋 버튼색 (.btnreset)'},
+  {g:'게시판', key:'boardBg',         en:'boardBg',         label:'게시판/우측 배경'},
+];
+
+function renderColors(cont) {
+  let lastG = '';
+  CDEFS.forEach(d => {
+    if (d.g !== lastG) {
+      lastG = d.g;
+      const h = mk('div','sec-hd'); h.textContent = d.g;
+      h.style.marginTop = lastG === CDEFS[0].g ? '0' : '10px';
+      cont.appendChild(h);
+    }
+    const row = mk('div','color-row');
+    const en = theme.colors.enabled[d.en];
+    const cb = mk('input'); cb.type='checkbox'; cb.checked=!!en;
+    cb.onchange = () => { theme.colors.enabled[d.en] = cb.checked; applyTheme(); };
+    const lbl = mk('label','color-label');
+    lbl.append(cb, ' ' + d.label);
+    const cp = mk('input'); cp.type='color'; cp.value = theme.colors[d.key]||'#ffffff';
+    const hx = mk('input','hex-inp'); hx.value = theme.colors[d.key]||'#ffffff'; hx.maxLength=7;
+    cp.oninput = () => { hx.value=cp.value; theme.colors[d.key]=cp.value; applyTheme(); };
+    hx.oninput = () => {
+      const v = hx.value.trim();
+      if (/^#[0-9a-fA-F]{6}$/.test(v)) { cp.value=v; theme.colors[d.key]=v; applyTheme(); }
+    };
+    row.append(lbl, cp, hx);
+    cont.appendChild(row);
+  });
+}
+
+// ══════════════════════════════════════
+//  BACKGROUNDS
+// ══════════════════════════════════════
+const TOPTS = [
+  {val:'.menu_infoArea',label:'메뉴 전체 영역'},
+  {val:'body',label:'페이지 전체 (body)'},
+  {val:'header',label:'헤더'},
+  {val:'.con_01',label:'con_01 섹션'},
+  {val:'.con_02',label:'con_02 섹션'},
+  {val:'.boardArea',label:'게시판 영역'},
+  {val:'.rightContents',label:'우측 컨텐츠'},
+  {val:'__custom__',label:'직접 입력...'},
+];
+
+function renderBg(cont) {
+  const h = mk('div','sec-hd'); h.textContent='배경 이미지'; cont.appendChild(h);
+
+  theme.backgrounds.forEach((bg, idx) => {
+    const card = mk('div','bg-card');
+    const hd = mk('div','bg-card-hd');
+    const title = mk('span','bg-card-title');
+    title.textContent = TOPTS.find(o=>o.val===bg.selector)?.label || bg.selector;
+    const rm = mk('button','bg-rm'); rm.textContent='✕';
+    rm.onclick = () => { theme.backgrounds.splice(idx,1); applyTheme(); renderCtrl(); };
+    hd.append(title, rm); card.appendChild(hd);
+
+    const selEl = mk('select','ctrl-sel');
+    TOPTS.forEach(o => { const op=mk('option'); op.value=o.val; op.textContent=o.label; if(o.val===bg.selector)op.selected=true; selEl.appendChild(op); });
+    const custInp = mk('input','ctrl-inp');
+    custInp.placeholder='.my-selector'; custInp.value=bg.customSel||'';
+    custInp.style.display = bg.selector==='__custom__'?'block':'none';
+    selEl.onchange = () => { bg.selector=selEl.value; custInp.style.display=selEl.value==='__custom__'?'block':'none'; title.textContent=TOPTS.find(o=>o.val===selEl.value)?.label||selEl.value; applyTheme(); };
+    custInp.oninput = () => { bg.customSel=custInp.value; applyTheme(); };
+    card.append(selEl, custInp);
+
+    const upBtn = mk('div','bg-upload');
+    upBtn.textContent = bg.imageData ? '🖼 이미지 변경' : '📁 이미지 선택';
+    upBtn.onclick = () => { bgEditIdx=idx; triggerBgFile(); };
+    card.appendChild(upBtn);
+
+    if (bg.imageData) {
+      const img = mk('img','bg-thumb'); img.src=bg.imageData; card.appendChild(img);
+    }
+
+    // Overlay slider
+    card.appendChild(mkSlider('어둡기', 0, 0.9, 0.05, bg.overlay||0,
+      v => { bg.overlay=v; applyTheme(); },
+      v => Math.round(v*100)+'%'));
+
+    // Size + Position
+    const szRow = mk('div'); szRow.style.cssText='display:flex;gap:5px;margin-top:4px';
+    szRow.append(
+      mkSel([['cover','꽉 채우기'],['contain','전체 보이기'],['auto','원본'],['100% 100%','늘리기']], bg.size||'cover', v=>{bg.size=v;applyTheme();}),
+      mkSel([['center','가운데'],['top','상단'],['bottom','하단'],['left','왼쪽'],['right','오른쪽']], bg.position||'center', v=>{bg.position=v;applyTheme();})
+    );
+    card.appendChild(szRow);
+    cont.appendChild(card);
+  });
+
+  const addBtn = mk('div','add-bg-btn'); addBtn.textContent='＋ 배경 이미지 추가';
+  addBtn.onclick = () => {
+    theme.backgrounds.push({selector:'.menu_infoArea',imageData:null,size:'cover',position:'center',repeat:'no-repeat',overlay:0.3,customSel:''});
+    renderCtrl();
+  };
+  cont.appendChild(addBtn);
+}
+
+function triggerBgFile() {
+  const fi = document.getElementById('bgFileInput');
+  fi.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      if (bgEditIdx !== null && theme.backgrounds[bgEditIdx]) {
+        theme.backgrounds[bgEditIdx].imageData = ev.target.result;
+        applyTheme(); renderCtrl();
+      }
+    };
+    r.readAsDataURL(file); e.target.value='';
+  };
+  fi.click();
+}
+
+// ══════════════════════════════════════
+//  MENU
+// ══════════════════════════════════════
+const MDEFS = [
+  {key:'lnb',      label:'LNB 탭바 (온나라/관리/알림/소통/지식)'},
+  {key:'gnbInner', label:'다크 GNB 드로어'},
+  {key:'result',   label:'SNB 서브메뉴 영역'},
+  {key:'menu01',   label:'메일 위젯'},
+  {key:'menu02',   label:'온나라 위젯'},
+  {key:'menu03',   label:'e-사람 위젯'},
+  {key:'menu04',   label:'배우리/문자발송 위젯'},
+  {key:'menu05',   label:'노사누리 위젯'},
+];
+
+function renderMenu(cont) {
+  const h = mk('div','sec-hd'); h.textContent='메뉴 표시/숨김'; cont.appendChild(h);
+  const list = mk('div','tog-list');
+  MDEFS.forEach(d => {
+    list.appendChild(mkTog(d.label, theme.menuConfig[d.key] !== false, v => { theme.menuConfig[d.key]=v; applyTheme(); }));
+  });
+  cont.appendChild(list);
+}
+
+// ══════════════════════════════════════
+//  LAYOUT
+// ══════════════════════════════════════
+const LDEFS = [
+  {key:'showHeader',       label:'헤더 표시'},
+  {key:'showFooter',       label:'푸터 표시'},
+  {key:'showMyLink',       label:'나의 업무링크 표시'},
+  {key:'showDauriFaq',     label:'빠른링크/헬프데스크 표시'},
+  {key:'menuAreaCentered', label:'메뉴 위젯 가운데 정렬'},
+  {key:'menuUlHidden',     label:'메뉴 위젯 본문 숨김 (헤더만 표시)'},
+];
+
+function renderLayout(cont) {
+  const h = mk('div','sec-hd'); h.textContent='레이아웃 설정'; cont.appendChild(h);
+  const list = mk('div','tog-list');
+  LDEFS.forEach(d => {
+    list.appendChild(mkTog(d.label, theme.layoutConfig[d.key] !== false, v => { theme.layoutConfig[d.key]=v; applyTheme(); }));
+  });
+  cont.appendChild(list);
+}
+
+// ══════════════════════════════════════
+//  BOARD PANELS
+// ══════════════════════════════════════
+const BDEFS = [
+  {key:'board_01', label:'게시판① — 정책공지/교육공지/일반공지/인사'},
+  {key:'board_02', label:'게시판② — 보도자료/보도설명/홍보물창고'},
+  {key:'board_03', label:'게시판③ — 우리부소식/서울청소식/지식SOS/재난'},
+  {key:'board_04', label:'게시판④ — 업무노하우/장터마당/경조사/백인백색'},
+  {key:'popzone',  label:'알림판 (팝존)'},
+];
+
+function renderBoard(cont) {
+  const h = mk('div','sec-hd'); h.textContent='게시판 패널 설정'; cont.appendChild(h);
+  BDEFS.forEach(d => {
+    const cfg = theme.boardPanels[d.key];
+    const item = mk('div','board-item');
+    const hd = mk('div','board-item-hd'); hd.textContent = d.label; item.appendChild(hd);
+
+    item.appendChild(mkTog('패널 숨김', cfg.hidden, v => { cfg.hidden=v; applyTheme(); renderCtrl(); }));
+
+    if (!cfg.hidden) {
+      const upBtn = mk('div','bg-upload'); upBtn.style.marginTop='6px';
+      upBtn.textContent = cfg.imageData ? '🖼 이미지 변경' : '📁 이미지 추가 (누끼 PNG 권장)';
+      upBtn.onclick = () => {
+        const fi = document.getElementById('bgFileInput');
+        fi.onchange = e => {
+          const file = e.target.files[0]; if (!file) return;
+          const r = new FileReader();
+          r.onload = ev => { cfg.imageData=ev.target.result; applyTheme(); renderCtrl(); };
+          r.readAsDataURL(file); e.target.value='';
+        };
+        fi.click();
+      };
+      item.appendChild(upBtn);
+
+      if (cfg.imageData) {
+        const img = mk('img','bg-thumb'); img.src=cfg.imageData; item.appendChild(img);
+        const modeRow = mk('div'); modeRow.style.cssText='display:flex;gap:5px;align-items:center;margin-top:4px';
+        const modeLbl = mk('span'); modeLbl.style.cssText='font-size:10px;color:var(--txt2);flex-shrink:0'; modeLbl.textContent='방식';
+        const modeSel = mkSel([['overlay','오버레이 (PNG 누끼)'],['cover','커버 (배경 교체)']], cfg.mode||'overlay', v=>{cfg.mode=v;applyTheme();});
+        modeSel.style.flex='1'; modeSel.style.marginBottom='0';
+        const rmBtn = mk('button'); rmBtn.textContent='✕ 제거'; rmBtn.style.cssText='background:none;border:1px solid #ef4444;color:#ef4444;border-radius:3px;padding:2px 7px;cursor:pointer;font-size:10px;flex-shrink:0';
+        rmBtn.onclick = () => { cfg.imageData=null; applyTheme(); renderCtrl(); };
+        modeRow.append(modeLbl, modeSel, rmBtn);
+        item.appendChild(modeRow);
+      }
+    }
+    cont.appendChild(item);
+  });
+}
+
+// ══════════════════════════════════════
+//  CUSTOM CSS
+// ══════════════════════════════════════
+function renderCSS(cont) {
+  const h = mk('div','sec-hd'); h.textContent='커스텀 CSS'; cont.appendChild(h);
+  const hint = mk('div','hint-text');
+  hint.textContent='포털에 직접 주입될 CSS입니다. 위 설정 이후에 적용됩니다.\n선택자는 실제 포털 DOM 기준으로 작성하세요.';
+  hint.style.whiteSpace='pre-line';
+  cont.appendChild(hint);
+  const ta = mk('textarea','css-ta');
+  ta.value = theme.customCSS||'';
+  ta.oninput = () => { theme.customCSS=ta.value; applyTheme(); };
+  cont.appendChild(ta);
+  const hint2 = mk('div','hint-text'); hint2.style.marginTop='6px';
+  hint2.textContent='예) header#header > div.inner { height: 60px !important; }';
+  cont.appendChild(hint2);
+}
+
+// ══════════════════════════════════════
+//  EXPORT / IMPORT
+// ══════════════════════════════════════
+function doExport() {
+  const out = JSON.parse(JSON.stringify(theme));
+  out.exportedAt = new Date().toISOString();
+  const blob = new Blob([JSON.stringify(out, null, 2)], {type:'application/json'});
+  const a = mk('a'); a.href=URL.createObjectURL(blob); a.download='portalTheme.json'; a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+function doImport() { document.getElementById('jsonImportInput').click(); }
+
+function handleJSONImport(e) {
+  const file = e.target.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      const t = data.colors ? data : (data.portalTheme || data);
+      if (!t.colors) throw new Error('portalTheme 형식이 아닙니다 (colors 필드 없음)');
+      theme = DEF();
+      if (t.colors) { Object.assign(theme.colors, t.colors); Object.assign(theme.colors.enabled, t.colors.enabled||{}); }
+      if (t.backgrounds) theme.backgrounds = t.backgrounds;
+      if (t.menuConfig) Object.assign(theme.menuConfig, t.menuConfig);
+      if (t.layoutConfig) Object.assign(theme.layoutConfig, t.layoutConfig);
+      if (t.boardPanels) Object.assign(theme.boardPanels, t.boardPanels);
+      if (t.customCSS !== undefined) theme.customCSS = t.customCSS;
+      applyTheme(); renderCtrl();
+      alert('테마 불러오기 완료!');
+    } catch(err) { alert('불러오기 실패: ' + err.message); }
+  };
+  r.readAsText(file); e.target.value='';
+}
+
+function doReset() {
+  if (!confirm('테마를 기본값으로 초기화할까요?')) return;
+  theme = DEF(); applyTheme(); renderCtrl();
+}
+
+// ══════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════
+function mk(tag, cls) {
+  const e = document.createElement(tag||'div');
+  if (cls) e.className = cls;
+  return e;
+}
+
+function mkTog(label, val, onchange) {
+  const row = mk('div','tog-row');
+  const lbl = mk('span','tog-label'); lbl.textContent = label;
+  const sw = mk('label','tog-sw');
+  const inp = mk('input'); inp.type='checkbox'; inp.checked=!!val;
+  inp.onchange = () => onchange(inp.checked);
+  const sldr = mk('span','sl');
+  sw.append(inp, sldr); row.append(lbl, sw);
+  return row;
+}
+
+function mkSlider(label, min, max, step, val, onchange, fmt) {
+  const row = mk('div','slider-row');
+  const lbl = mk('span','slider-label'); lbl.textContent=label;
+  const sl = mk('input'); sl.type='range'; sl.min=min; sl.max=max; sl.step=step; sl.value=val;
+  const vl = mk('span','slider-val'); vl.textContent=fmt?fmt(val):val;
+  sl.oninput = () => { const v=parseFloat(sl.value); vl.textContent=fmt?fmt(v):v; onchange(v); };
+  row.append(lbl, sl, vl);
+  return row;
+}
+
+function mkSel(opts, val, onchange) {
+  const s = mk('select','ctrl-sel');
+  s.style.marginBottom='0';
+  opts.forEach(([v,l]) => { const o=mk('option'); o.value=v; o.textContent=l; if(v===val)o.selected=true; s.appendChild(o); });
+  s.onchange = () => onchange(s.value);
+  return s;
+}
+
+// ══════════════════════════════════════
+//  SCALE PREVIEW
+// ══════════════════════════════════════
+function scalePreview() {
+  const wrap = document.getElementById('previewWrap');
+  const ppc  = document.getElementById('ppc');
+  const sw   = document.getElementById('scale-wrap');
+  const pp   = document.getElementById('portal-preview');
+  if (!wrap || !ppc || !sw || !pp) return;
+  const aw = wrap.clientWidth - 20;
+  const s  = Math.min(aw / 1200, 1);
+  ppc.style.transform = `scale(${s})`;
+  ppc.style.transformOrigin = 'top left';
+  sw.style.width  = Math.round(1200 * s) + 'px';
+  // Use rAF to read rendered height after scale
+  requestAnimationFrame(() => {
+    sw.style.height = Math.round(pp.offsetHeight * s) + 'px';
+  });
+  document.getElementById('scale-val').textContent = Math.round(s * 100) + '%';
+}
+window.addEventListener('resize', scalePreview);
+requestAnimationFrame(() => requestAnimationFrame(scalePreview));
+
+// ══════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════
+applyTheme();
+renderCtrl();
+</script>
+</body>
+</html>
