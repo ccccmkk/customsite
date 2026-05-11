@@ -216,6 +216,18 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
 .prop-lbl{font-size:10px;color:var(--txt2);width:54px;flex-shrink:0}
 .prop-inp{flex:1;background:var(--sur2);border:1px solid var(--bdr);border-radius:3px;padding:3px 5px;font-size:11px;color:var(--txt);outline:none;font-family:inherit;min-width:0}
 .prop-inp:focus{border-color:var(--acc)}
+/* Modebar */
+.modebar{height:36px;background:#0f172a;display:flex;align-items:center;padding:0 14px;gap:4px;flex-shrink:0;border-bottom:2px solid #1e293b}
+.mdbtn{height:26px;padding:0 14px;border-radius:13px;border:1px solid transparent;background:transparent;color:#475569;cursor:pointer;font-size:11px;font-family:inherit;font-weight:600;transition:all .15s;white-space:nowrap}
+.mdbtn:hover{color:#94a3b8;background:rgba(255,255,255,.05)}
+.mdbtn.active{background:var(--acc);color:#fff}
+.md-sep{width:1px;height:18px;background:#1e3a5f;margin:0 6px;flex-shrink:0}
+/* Arrange mode */
+.arrange-active .ps{outline:none!important}
+.arr-draggable{cursor:grab!important;position:relative}
+.arr-draggable::before{content:'⠿ 드래그';position:absolute;top:2px;right:4px;font-size:9px;color:rgba(255,255,255,.7);background:rgba(0,0,0,.3);padding:1px 4px;border-radius:2px;z-index:10;pointer-events:none}
+.arr-dragging{opacity:.5}
+.arr-over{outline:2px dashed var(--acc)!important;outline-offset:-2px}
 </style>
 </head>
 <body>
@@ -227,6 +239,14 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
   <button class="tb-btn" onclick="doImport()">📂 JSON 불러오기</button>
   <button class="tb-btn" onclick="doReset()">↺ 초기화</button>
   <button class="tb-btn p" onclick="doExport()">⬇ portalTheme.json 저장</button>
+</div>
+
+<div class="modebar">
+  <button class="mdbtn active" data-mode="style" onclick="setMode('style')">🎨 색상 편집</button>
+  <div class="md-sep"></div>
+  <button class="mdbtn" data-mode="arrange" onclick="setMode('arrange')">⊞ 배치 수정</button>
+  <div class="md-sep"></div>
+  <button class="mdbtn" data-mode="canvas" onclick="setMode('canvas')">🖼 캔버스</button>
 </div>
 
 <div class="main">
@@ -513,6 +533,7 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
     <div class="cv-toolbar" style="flex-shrink:0">
       <button class="cv-btn" onclick="addShape('rect')">＋ 도형</button>
       <button class="cv-btn" onclick="addShape('text')">＋ 텍스트</button>
+      <button class="cv-btn" onclick="addImageShape()">🖼 이미지</button>
       <div class="cv-sep"></div>
       <button class="cv-btn" onclick="shapeLayerUp()">↑ 앞으로</button>
       <button class="cv-btn" onclick="shapeLayerDown()">↓ 뒤로</button>
@@ -536,8 +557,8 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
       <div class="ctab" data-tab="layout" onclick="switchTab('layout')">⊞ 레이아웃</div>
       <div class="ctab" data-tab="board" onclick="switchTab('board')">📋 게시판</div>
       <div class="ctab" data-tab="css" onclick="switchTab('css')">{ } CSS</div>
-      <div class="ctab" data-tab="canvas" onclick="switchTab('canvas')">🖼 캔버스</div>
     </div>
+    <!-- canvas tab removed - now activated via mode bar -->
     <div class="ctrl-scroll" id="ctrl-scroll"></div>
   </div>
 </div>
@@ -578,6 +599,10 @@ const DEF = () => ({
     enabled:false,
     background:'#f0f2f5',
     shapes:[]
+  },
+  layoutOrder:{
+    widgets:['menu01','menu02','menu03','menu04','menu05'],
+    boards:['board_01','board_02','board_03','board_04']
   }
 });
 
@@ -670,6 +695,21 @@ function generateCSS(t) {
     }
   });
 
+  const lo = t.layoutOrder || {};
+  if (lo.widgets) {
+    lo.widgets.forEach((key, i) => {
+      css += `.menu_infoArea div.${key} { order: ${i+1} !important; }\n`;
+    });
+  }
+  if (lo.boards) {
+    css += `#noticeZone.boardArea { display: flex !important; flex-wrap: wrap !important; }\n`;
+    css += `#noticeZone.boardArea > div { width: 50% !important; box-sizing: border-box !important; }\n`;
+    lo.boards.forEach((key, i) => {
+      const sel = key === 'board_01' ? '.notice1.board_01' : key === 'board_02' ? '.notice1.board_02' : key === 'board_03' ? '.notice2.board_03' : '.notice2.board_04';
+      css += `${sel} { order: ${i+1} !important; }\n`;
+    });
+  }
+
   if (t.customCSS?.trim()) css += '\n' + t.customCSS + '\n';
   return css;
 }
@@ -742,18 +782,6 @@ function sel(e, rid) {
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.ctab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
-  const cvEd  = document.getElementById('canvas-editor');
-  const pvWrap = document.getElementById('previewWrap');
-  if (tab === 'canvas') {
-    cvEd.classList.add('cv-active');
-    pvWrap.style.display = 'none';
-    scaleCanvas();
-    renderCanvas();
-  } else {
-    cvEd.classList.remove('cv-active');
-    pvWrap.style.display = '';
-    requestAnimationFrame(scalePreview);
-  }
   renderCtrl();
 }
 
@@ -765,8 +793,153 @@ function renderCtrl() {
   else if (currentTab === 'menu') renderMenu(s);
   else if (currentTab === 'layout') renderLayout(s);
   else if (currentTab === 'board') renderBoard(s);
-  else if (currentTab === 'canvas') renderCanvasCtrl(s);
   else renderCSS(s);
+}
+
+// ══════════════════════════════════════
+//  MODE BAR
+// ══════════════════════════════════════
+let currentMode = 'style';
+
+function setMode(mode) {
+  currentMode = mode;
+  document.querySelectorAll('.mdbtn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  disableArrangeMode();
+
+  const previewArea = document.querySelector('.preview-area');
+  const canvasEditor = document.getElementById('canvas-editor');
+  const ctrlTabs = document.querySelector('.ctrl-tabs');
+  const ctrlScroll = document.getElementById('ctrl-scroll');
+  const previewWrap = document.getElementById('previewWrap');
+
+  if (mode === 'style') {
+    previewArea.style.display = '';
+    canvasEditor.classList.remove('cv-active');
+    ctrlTabs.style.display = '';
+    previewWrap.style.display = '';
+    renderCtrl();
+    requestAnimationFrame(scalePreview);
+  } else if (mode === 'arrange') {
+    previewArea.style.display = '';
+    canvasEditor.classList.remove('cv-active');
+    ctrlTabs.style.display = 'none';
+    previewWrap.style.display = '';
+    enableArrangeMode();
+    ctrlScroll.innerHTML = '';
+    renderArrangeCtrl(ctrlScroll);
+    requestAnimationFrame(scalePreview);
+  } else if (mode === 'canvas') {
+    previewArea.style.display = 'none';
+    canvasEditor.classList.add('cv-active');
+    ctrlTabs.style.display = 'none';
+    ctrlScroll.innerHTML = '';
+    renderCanvasCtrl(ctrlScroll);
+    scaleCanvas();
+    renderCanvas();
+  }
+}
+
+// ══════════════════════════════════════
+//  ARRANGE MODE
+// ══════════════════════════════════════
+let arrangeDragSrc = null;
+
+function enableArrangeMode() {
+  document.getElementById('portal-preview').classList.add('arrange-active');
+  const widgets = document.querySelectorAll('#portal-preview .menu_infoArea > div[class^=menu]');
+  widgets.forEach(el => {
+    el.draggable = true;
+    el.classList.add('arr-draggable');
+    el.addEventListener('dragstart', arrDragStart);
+    el.addEventListener('dragover', arrDragOver);
+    el.addEventListener('drop', arrDrop);
+    el.addEventListener('dragend', arrDragEnd);
+  });
+}
+
+function disableArrangeMode() {
+  document.getElementById('portal-preview')?.classList.remove('arrange-active');
+  document.querySelectorAll('.arr-draggable').forEach(el => {
+    el.draggable = false;
+    el.classList.remove('arr-draggable', 'arr-over');
+    el.removeEventListener('dragstart', arrDragStart);
+    el.removeEventListener('dragover', arrDragOver);
+    el.removeEventListener('drop', arrDrop);
+    el.removeEventListener('dragend', arrDragEnd);
+  });
+}
+
+function arrDragStart(e) { arrangeDragSrc = this; this.classList.add('arr-dragging'); e.dataTransfer.effectAllowed='move'; }
+function arrDragOver(e) { e.preventDefault(); e.dataTransfer.dropEffect='move'; document.querySelectorAll('.arr-over').forEach(el=>el.classList.remove('arr-over')); this.classList.add('arr-over'); }
+function arrDragEnd() { this.classList.remove('arr-dragging'); document.querySelectorAll('.arr-over').forEach(el=>el.classList.remove('arr-over')); }
+function arrDrop(e) {
+  e.stopPropagation(); e.preventDefault();
+  if (arrangeDragSrc === this) return;
+  const parent = this.parentNode;
+  const srcIdx = Array.from(parent.children).indexOf(arrangeDragSrc);
+  const dstIdx = Array.from(parent.children).indexOf(this);
+  if (srcIdx < dstIdx) parent.insertBefore(arrangeDragSrc, this.nextSibling);
+  else parent.insertBefore(arrangeDragSrc, this);
+  const newOrder = Array.from(parent.querySelectorAll('[class^=menu]')).map(el => el.className.match(/menu0\d/)?.[0]).filter(Boolean);
+  theme.layoutOrder.widgets = newOrder;
+  applyTheme();
+  renderArrangeCtrl(document.getElementById('ctrl-scroll'));
+}
+
+function renderArrangeCtrl(cont) {
+  cont.innerHTML = '';
+  const h1 = mk('div','sec-hd'); h1.textContent = '배치 수정 모드'; cont.appendChild(h1);
+
+  const hint = mk('div','hint-text'); hint.style.marginBottom='10px';
+  hint.textContent = '미리보기에서 위젯을 드래그해 순서를 변경하세요. 변경 내용은 저장 시 포털에 반영됩니다.';
+  cont.appendChild(hint);
+
+  const h2 = mk('div','sec-hd'); h2.textContent = '메뉴 위젯 순서'; cont.appendChild(h2);
+  const WLABELS = { menu01:'메일', menu02:'온나라', menu03:'e-사람', menu04:'배우리/문자', menu05:'노사누리' };
+
+  theme.layoutOrder.widgets.forEach((key, i) => {
+    const row = mk('div'); row.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:5px 8px;background:var(--sur2);border:1px solid var(--bdr);border-radius:4px;font-size:11px;';
+    const lbl = mk('span'); lbl.style.flex='1'; lbl.textContent = (i+1)+'. '+(WLABELS[key]||key);
+    const up = mk('button','cv-btn'); up.textContent='↑'; up.style.padding='0 7px';
+    const dn = mk('button','cv-btn'); dn.textContent='↓'; dn.style.padding='0 7px';
+    up.onclick = () => {
+      if (i === 0) return;
+      [theme.layoutOrder.widgets[i-1], theme.layoutOrder.widgets[i]] = [key, theme.layoutOrder.widgets[i-1]];
+      const els = document.querySelectorAll('#portal-preview .menu_infoArea > div[class^=menu]');
+      const parent = els[0]?.parentNode;
+      if (parent && els[i] && els[i-1]) parent.insertBefore(els[i], els[i-1]);
+      applyTheme(); setMode('arrange');
+    };
+    dn.onclick = () => {
+      if (i === theme.layoutOrder.widgets.length-1) return;
+      [theme.layoutOrder.widgets[i], theme.layoutOrder.widgets[i+1]] = [theme.layoutOrder.widgets[i+1], key];
+      const els = document.querySelectorAll('#portal-preview .menu_infoArea > div[class^=menu]');
+      const parent = els[0]?.parentNode;
+      if (parent && els[i] && els[i+1]) parent.insertBefore(els[i+1], els[i]);
+      applyTheme(); setMode('arrange');
+    };
+    row.append(lbl, up, dn); cont.appendChild(row);
+  });
+
+  const h3 = mk('div','sec-hd'); h3.style.marginTop='12px'; h3.textContent = '게시판 순서'; cont.appendChild(h3);
+  const BLABELS = { board_01:'게시판①(정책공지)', board_02:'게시판②(보도자료)', board_03:'게시판③(우리부소식)', board_04:'게시판④(업무노하우)' };
+  theme.layoutOrder.boards.forEach((key, i) => {
+    const row = mk('div'); row.style.cssText='display:flex;align-items:center;gap:6px;margin-bottom:5px;padding:5px 8px;background:var(--sur2);border:1px solid var(--bdr);border-radius:4px;font-size:11px;';
+    const lbl = mk('span'); lbl.style.flex='1'; lbl.textContent = (i+1)+'. '+(BLABELS[key]||key);
+    const up = mk('button','cv-btn'); up.textContent='↑'; up.style.padding='0 7px';
+    const dn = mk('button','cv-btn'); dn.textContent='↓'; dn.style.padding='0 7px';
+    up.onclick = () => {
+      if (i===0) return;
+      [theme.layoutOrder.boards[i-1], theme.layoutOrder.boards[i]] = [key, theme.layoutOrder.boards[i-1]];
+      applyTheme(); setMode('arrange');
+    };
+    dn.onclick = () => {
+      if (i===theme.layoutOrder.boards.length-1) return;
+      [theme.layoutOrder.boards[i], theme.layoutOrder.boards[i+1]] = [theme.layoutOrder.boards[i+1], key];
+      applyTheme(); setMode('arrange');
+    };
+    row.append(lbl, up, dn); cont.appendChild(row);
+  });
 }
 
 // ══════════════════════════════════════
@@ -1039,6 +1212,7 @@ function handleJSONImport(e) {
       if (t.boardPanels) Object.assign(theme.boardPanels, t.boardPanels);
       if (t.customCSS !== undefined) theme.customCSS = t.customCSS;
       if (t.customLayout) Object.assign(theme.customLayout, t.customLayout);
+      if (t.layoutOrder) Object.assign(theme.layoutOrder, t.layoutOrder);
       applyTheme(); renderCtrl();
       alert('테마 불러오기 완료!');
     } catch(err) { alert('불러오기 실패: ' + err.message); }
@@ -1138,6 +1312,18 @@ function initCanvas() {
   });
 }
 
+function shapeBackground(shape) {
+  if (shape.type === 'image') return 'none';
+  if (shape.fillType === 'linear') return `linear-gradient(${shape.gradDir||'135deg'},${shape.gradFrom||'#2a8080'},${shape.gradTo||'#0f4050'})`;
+  if (shape.fillType === 'radial') return `radial-gradient(circle,${shape.gradFrom||'#2a8080'},${shape.gradTo||'#0f4050'})`;
+  return shape.fill || '#2a8080';
+}
+
+function shapeShadow(shape) {
+  if (!shape.shadow) return 'none';
+  return `${shape.shadowX||0}px ${shape.shadowY!==undefined?shape.shadowY:4}px ${shape.shadowBlur!==undefined?shape.shadowBlur:12}px ${shape.shadowColor||'rgba(0,0,0,0.25)'}`;
+}
+
 function renderCanvas() {
   const cv = document.getElementById('cv');
   if (!cv) return;
@@ -1151,11 +1337,23 @@ function renderCanvas() {
     el.className = 'cv-shape' + (isSel ? ' sel' : '');
     el.id = 'cvs_' + shape.id;
     el.style.cssText = `left:${shape.x}px;top:${shape.y}px;width:${shape.w}px;height:${shape.h}px;`
-      + `background:${shape.fill||'#2a8080'};color:${shape.color||'#fff'};`
-      + `border-radius:${shape.borderRadius||0}px;font-size:${shape.fontSize||14}px;`
+      + `background:${shapeBackground(shape)};`
+      + (shape.type==='image' && shape.imageData ? `background-image:url(${shape.imageData});background-size:cover;background-position:center;background-repeat:no-repeat;` : '')
+      + `color:${shape.color||'#fff'};`
+      + `border-radius:${shape.borderRadius||0}px;`
+      + `font-size:${shape.fontSize||14}px;`
       + `font-weight:${shape.fontWeight||'bold'};`
       + `border:${shape.borderWidth||0}px solid ${shape.borderColor||'transparent'};`
-      + `z-index:${shape.zIndex||1};box-shadow:${shape.shadow?'0 2px 8px rgba(0,0,0,.2)':'none'};`;
+      + `box-shadow:${shapeShadow(shape)};`
+      + `opacity:${shape.opacity!==undefined?shape.opacity:1};`
+      + `filter:${shape.type==='image'&&shape.brightness!==undefined?'brightness('+shape.brightness+')':'none'};`
+      + `z-index:${shape.zIndex||1};padding:4px;`;
+    if (shape.type==='image' && shape.watermark) {
+      const wm = document.createElement('div');
+      wm.style.cssText='position:absolute;bottom:4px;right:6px;font-size:10px;color:rgba(255,255,255,0.7);text-shadow:0 1px 2px rgba(0,0,0,.5);pointer-events:none';
+      wm.textContent = shape.watermark;
+      el.appendChild(wm);
+    }
     if (shape.icon) {
       const ic = document.createElement('div');
       ic.className = 'si'; ic.style.fontSize = (shape.fontSize||14)*1.6+'px'; ic.textContent = shape.icon;
@@ -1198,16 +1396,44 @@ function addShape(type) {
     x:60+offset, y:60+offset,
     w: type==='text'?180:160, h: type==='text'?44:80,
     fill: type==='text'?'transparent':'#2a8080',
+    fillType:'solid', gradFrom:'#2a8080', gradTo:'#0f4050', gradDir:'135deg',
     color: type==='text'?'#1e293b':'#ffffff',
     text: type==='text'?'텍스트 입력':'메뉴',
     icon: type==='text'?'':'📋',
     fontSize:14, fontWeight:'bold',
     borderRadius: type==='text'?0:8,
     borderWidth:0, borderColor:'#ccc',
-    link:'', zIndex:shapes.length+1, shadow:false
+    link:'', zIndex:shapes.length+1,
+    shadow:false, shadowX:0, shadowY:4, shadowBlur:12, shadowColor:'rgba(0,0,0,0.25)'
   });
   cvSelId = id;
   renderCanvas(); renderCtrl();
+}
+
+function addImageShape() {
+  const fi = document.createElement('input');
+  fi.type = 'file'; fi.accept = 'image/*';
+  fi.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      const shapes = theme.customLayout.shapes;
+      const id = 'sh_'+Math.random().toString(36).slice(2,7);
+      const offset = (shapes.length%8)*16;
+      shapes.push({
+        id, type:'image',
+        x:60+offset, y:60+offset, w:240, h:160,
+        imageData:ev.target.result,
+        opacity:1.0, brightness:1.0, watermark:'',
+        borderRadius:0, borderWidth:0, borderColor:'#ccc',
+        shadow:false, shadowX:0, shadowY:4, shadowBlur:12, shadowColor:'rgba(0,0,0,0.25)',
+        zIndex: shapes.length+1
+      });
+      cvSelId = id; renderCanvas(); renderCtrl();
+    };
+    r.readAsDataURL(file);
+  };
+  fi.click();
 }
 
 function delShape() {
@@ -1242,6 +1468,7 @@ function shapeLayerDown() {
 
 function renderCanvasCtrl(cont) {
   const layout = theme.customLayout;
+  cont.innerHTML = '';
 
   const h1 = mk('div','sec-hd'); h1.textContent='캔버스 설정'; cont.appendChild(h1);
   cont.appendChild(mkTog('포털에서 활성화 (전체 화면 교체)', layout.enabled||false, v=>{layout.enabled=v;}));
@@ -1262,11 +1489,11 @@ function renderCanvasCtrl(cont) {
   if (!layout.shapes.length) {
     const em=mk('div','hint-text'); em.textContent='도형이 없습니다. 상단 ＋ 버튼으로 추가하세요.'; cont.appendChild(em);
   } else {
-    layout.shapes.slice().reverse().forEach((shape,ri) => {
+    layout.shapes.slice().reverse().forEach((shape) => {
       const item = mk('div','sli'+(shape.id===cvSelId?' sel-item':''));
-      const ic=mk('span','sli-ic'); ic.textContent=shape.icon||'▭';
-      const nm=mk('span','sli-nm'); nm.textContent=shape.text||(shape.icon?'':'도형');
-      item.append(ic,nm); item.onclick=()=>{cvSelId=shape.id;renderCanvas();renderCtrl();};
+      const ic=mk('span','sli-ic'); ic.textContent=shape.type==='image'?'🖼':(shape.icon||'▭');
+      const nm=mk('span','sli-nm'); nm.textContent=shape.type==='image'?('이미지'+(shape.watermark?' ['+shape.watermark+']':'')):(shape.text||(shape.icon?'':'도형'));
+      item.append(ic,nm); item.onclick=()=>{cvSelId=shape.id;renderCanvas();renderCanvasCtrl(document.getElementById('ctrl-scroll'));};
       cont.appendChild(item);
     });
   }
@@ -1276,20 +1503,98 @@ function renderCanvasCtrl(cont) {
   if (shape) {
     const h3=mk('div','sec-hd'); h3.style.marginTop='12px'; h3.textContent='도형 속성'; cont.appendChild(h3);
 
-    // Text + Icon + Link
-    [
-      {lbl:'텍스트', key:'text', ph:'버튼 이름'},
-      {lbl:'아이콘', key:'icon', ph:'이모지 (✉ 📋 👤)'},
-      {lbl:'링크 URL', key:'link', ph:'http://dauri.moel.go.kr/...'},
-    ].forEach(({lbl,key,ph}) => {
-      const row=mk('div','prop-row');
-      const l=mk('span','prop-lbl'); l.textContent=lbl;
-      const inp=mk('input','prop-inp'); inp.type='text'; inp.value=shape[key]||''; inp.placeholder=ph||'';
-      inp.oninput=()=>{shape[key]=inp.value; renderCanvas();};
-      row.append(l,inp); cont.appendChild(row);
-    });
+    if (shape.type === 'image') {
+      // ── IMAGE SHAPE CONTROLS ──
+      const chgBtn=mk('button','tb-btn'); chgBtn.style.width='100%'; chgBtn.textContent='🖼 이미지 변경';
+      chgBtn.onclick=()=>{
+        const fi=document.createElement('input'); fi.type='file'; fi.accept='image/*';
+        fi.onchange=e=>{const file=e.target.files[0];if(!file)return;const r=new FileReader();r.onload=ev=>{shape.imageData=ev.target.result;renderCanvas();renderCanvasCtrl(document.getElementById('ctrl-scroll'));};r.readAsDataURL(file);};
+        fi.click();
+      };
+      cont.appendChild(chgBtn);
 
-    // Number props
+      cont.appendChild(mkSlider('투명도', 0, 1, 0.05, shape.opacity!==undefined?shape.opacity:1, v=>{shape.opacity=v;renderCanvas();}, v=>Math.round(v*100)+'%'));
+      cont.appendChild(mkSlider('밝기', 0.1, 2, 0.05, shape.brightness!==undefined?shape.brightness:1, v=>{shape.brightness=v;renderCanvas();}, v=>Math.round(v*100)+'%'));
+
+      const wmRow=mk('div','prop-row');
+      const wmL=mk('span','prop-lbl'); wmL.textContent='워터마크';
+      const wmInp=mk('input','prop-inp'); wmInp.type='text'; wmInp.value=shape.watermark||''; wmInp.placeholder='텍스트 입력 (우측 하단)';
+      wmInp.oninput=()=>{shape.watermark=wmInp.value;renderCanvas();};
+      wmRow.append(wmL,wmInp); cont.appendChild(wmRow);
+
+    } else {
+      // ── NON-IMAGE SHAPE CONTROLS ──
+
+      // Text + Icon + Link
+      [
+        {lbl:'텍스트', key:'text', ph:'버튼 이름'},
+        {lbl:'아이콘', key:'icon', ph:'이모지 (✉ 📋 👤)'},
+        {lbl:'링크 URL', key:'link', ph:'http://dauri.moel.go.kr/...'},
+      ].forEach(({lbl,key,ph}) => {
+        const row=mk('div','prop-row');
+        const l=mk('span','prop-lbl'); l.textContent=lbl;
+        const inp=mk('input','prop-inp'); inp.type='text'; inp.value=shape[key]||''; inp.placeholder=ph||'';
+        inp.oninput=()=>{shape[key]=inp.value; renderCanvas();};
+        row.append(l,inp); cont.appendChild(row);
+      });
+
+      // Fill type selector
+      const ftRow = mk('div','prop-row');
+      const ftL = mk('span','prop-lbl'); ftL.textContent='채우기';
+      const ftSel = mkSel([['solid','단색'],['linear','선형 그라데이션'],['radial','방사형 그라데이션']], shape.fillType||'solid', v=>{shape.fillType=v;renderCanvas();renderCanvasCtrl(document.getElementById('ctrl-scroll'));});
+      ftRow.append(ftL,ftSel); cont.appendChild(ftRow);
+
+      if (!shape.fillType || shape.fillType==='solid') {
+        // Solid fill color
+        const row=mk('div','color-row');
+        const l=mk('label','color-label'); l.textContent='채우기 색';
+        const cp=mk('input'); cp.type='color'; cp.value=shape.fill||'#2a8080';
+        const hx=mk('input','hex-inp'); hx.value=shape.fill||'#2a8080'; hx.maxLength=7;
+        cp.oninput=()=>{hx.value=cp.value;shape.fill=cp.value;renderCanvas();};
+        hx.oninput=()=>{const v=hx.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v)){cp.value=v;shape.fill=v;renderCanvas();}};
+        row.append(l,cp,hx); cont.appendChild(row);
+      } else {
+        // Gradient: gradFrom + gradTo
+        [{lbl:'시작 색',key:'gradFrom'},{lbl:'끝 색',key:'gradTo'}].forEach(({lbl,key})=>{
+          const row=mk('div','color-row');
+          const l=mk('label','color-label'); l.textContent=lbl;
+          const cp=mk('input'); cp.type='color'; cp.value=shape[key]||'#2a8080';
+          const hx=mk('input','hex-inp'); hx.value=shape[key]||'#2a8080'; hx.maxLength=7;
+          cp.oninput=()=>{hx.value=cp.value;shape[key]=cp.value;renderCanvas();};
+          hx.oninput=()=>{const v=hx.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v)){cp.value=v;shape[key]=v;renderCanvas();}};
+          row.append(l,cp,hx); cont.appendChild(row);
+        });
+        if (shape.fillType==='linear') {
+          const dirRow=mk('div','prop-row');
+          const dirL=mk('span','prop-lbl'); dirL.textContent='방향';
+          const dirSel=mkSel([['135deg','대각선↘'],['to bottom','위→아래'],['to right','좌→우'],['to top right','대각선↗'],['45deg','45°']], shape.gradDir||'135deg', v=>{shape.gradDir=v;renderCanvas();});
+          dirRow.append(dirL,dirSel); cont.appendChild(dirRow);
+        }
+      }
+
+      // Text color
+      const tcRow=mk('div','color-row');
+      const tcL=mk('label','color-label'); tcL.textContent='텍스트 색';
+      const tcCp=mk('input'); tcCp.type='color'; tcCp.value=shape.color||'#ffffff';
+      const tcHx=mk('input','hex-inp'); tcHx.value=shape.color||'#ffffff'; tcHx.maxLength=7;
+      tcCp.oninput=()=>{tcHx.value=tcCp.value;shape.color=tcCp.value;renderCanvas();};
+      tcHx.oninput=()=>{const v=tcHx.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v)){tcCp.value=v;shape.color=v;renderCanvas();}};
+      tcRow.append(tcL,tcCp,tcHx); cont.appendChild(tcRow);
+
+      // Border color
+      const bcRow=mk('div','color-row');
+      const bcL=mk('label','color-label'); bcL.textContent='테두리 색';
+      const bcCp=mk('input'); bcCp.type='color'; bcCp.value=shape.borderColor||'#cccccc';
+      const bcHx=mk('input','hex-inp'); bcHx.value=shape.borderColor||'#cccccc'; bcHx.maxLength=7;
+      bcCp.oninput=()=>{bcHx.value=bcCp.value;shape.borderColor=bcCp.value;renderCanvas();};
+      bcHx.oninput=()=>{const v=bcHx.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v)){bcCp.value=v;shape.borderColor=v;renderCanvas();}};
+      bcRow.append(bcL,bcCp,bcHx); cont.appendChild(bcRow);
+
+      // Bold toggle
+      cont.appendChild(mkTog('굵게', shape.fontWeight==='bold', v=>{shape.fontWeight=v?'bold':'normal';renderCanvas();}));
+    }
+
+    // Common numeric props (for all shape types)
     [
       {lbl:'글자 크기', key:'fontSize', min:8, max:72, step:1},
       {lbl:'둥글기', key:'borderRadius', min:0, max:200, step:1},
@@ -1303,20 +1608,18 @@ function renderCanvasCtrl(cont) {
       row.append(l,inp); cont.appendChild(row);
     });
 
-    // Color rows
-    [{lbl:'채우기',key:'fill'},{lbl:'텍스트 색',key:'color'},{lbl:'테두리 색',key:'borderColor'}].forEach(({lbl,key})=>{
-      const row=mk('div','color-row');
-      const l=mk('label','color-label'); l.textContent=lbl;
-      const cp=mk('input'); cp.type='color'; cp.value=shape[key]||'#000000';
-      const hx=mk('input','hex-inp'); hx.value=shape[key]||'#000000'; hx.maxLength=7;
-      cp.oninput=()=>{hx.value=cp.value;shape[key]=cp.value;renderCanvas();};
-      hx.oninput=()=>{const v=hx.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v)){cp.value=v;shape[key]=v;renderCanvas();}};
-      row.append(l,cp,hx); cont.appendChild(row);
-    });
-
-    // Bold + Shadow toggles
-    cont.appendChild(mkTog('굵게', shape.fontWeight==='bold', v=>{shape.fontWeight=v?'bold':'normal';renderCanvas();}));
-    cont.appendChild(mkTog('그림자', shape.shadow||false, v=>{shape.shadow=v;renderCanvas();}));
+    // Shadow section
+    const shadowTog = mkTog('그림자', shape.shadow||false, v=>{shape.shadow=v; renderCanvas(); renderCanvasCtrl(document.getElementById('ctrl-scroll'));});
+    cont.appendChild(shadowTog);
+    if (shape.shadow) {
+      cont.appendChild(mkSlider('X 이동', -20, 20, 1, shape.shadowX||0, v=>{shape.shadowX=v;renderCanvas();}, v=>v+'px'));
+      cont.appendChild(mkSlider('Y 이동', -20, 20, 1, shape.shadowY!==undefined?shape.shadowY:4, v=>{shape.shadowY=v;renderCanvas();}, v=>v+'px'));
+      cont.appendChild(mkSlider('번짐', 0, 40, 1, shape.shadowBlur!==undefined?shape.shadowBlur:12, v=>{shape.shadowBlur=v;renderCanvas();}, v=>v+'px'));
+      const scRow=mk('div','color-row');
+      const scL=mk('label','color-label'); scL.textContent='그림자 색';
+      const scCp=mk('input'); scCp.type='color'; scCp.value='#000000';
+      scRow.append(scL,scCp); cont.appendChild(scRow);
+    }
 
     const delBtn=mk('button','tb-btn');
     delBtn.style.cssText='width:100%;margin-top:8px;color:#ef4444;border-color:#ef4444';
@@ -1359,7 +1662,10 @@ function scalePreview() {
   });
   document.getElementById('scale-val').textContent = Math.round(s * 100) + '%';
 }
-window.addEventListener('resize', scalePreview);
+window.addEventListener('resize', () => {
+  if (currentMode === 'canvas') scaleCanvas();
+  else scalePreview();
+});
 requestAnimationFrame(() => requestAnimationFrame(scalePreview));
 
 // ══════════════════════════════════════
