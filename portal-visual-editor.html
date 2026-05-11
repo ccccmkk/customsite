@@ -1432,6 +1432,7 @@ function addShape(type) {
     shadow:false, shadowX:0, shadowY:4, shadowBlur:12, shadowColor:'rgba(0,0,0,0.25)'
   });
   cvSelId = id;
+  theme.customLayout.enabled = true;
   renderCanvas(); renderCtrl();
 }
 
@@ -1454,7 +1455,9 @@ function addImageShape() {
         shadow:false, shadowX:0, shadowY:4, shadowBlur:12, shadowColor:'rgba(0,0,0,0.25)',
         zIndex: shapes.length+1
       });
-      cvSelId = id; renderCanvas(); renderCtrl();
+      cvSelId = id;
+      theme.customLayout.enabled = true;
+      renderCanvas(); renderCtrl();
     };
     r.readAsDataURL(file);
   };
@@ -1464,6 +1467,7 @@ function addImageShape() {
 function delShape() {
   if (!cvSelId) return;
   theme.customLayout.shapes = theme.customLayout.shapes.filter(s=>s.id!==cvSelId);
+  if (theme.customLayout.shapes.length === 0) theme.customLayout.enabled = false;
   cvSelId = null; renderCanvas(); renderCtrl();
 }
 
