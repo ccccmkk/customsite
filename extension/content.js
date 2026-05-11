@@ -125,9 +125,20 @@ function generateCSS(theme) {
   return css;
 }
 
+const LAYOUT_ID = '__ptheme_layout__';
+
 function applyTheme(theme) {
   document.getElementById(STYLE_ID)?.remove();
+  removeCustomLayout();
   if (!theme) return;
+
+  // 커스텀 레이아웃이 활성화된 경우 전체 화면 교체
+  const cl = theme.customLayout;
+  if (cl?.enabled && cl.shapes?.length) {
+    injectCustomLayout(cl);
+    return; // CSS 테마는 적용하지 않음 (레이아웃이 덮으므로)
+  }
+
   const css = generateCSS(theme);
   if (!css.trim()) return;
   const style = document.createElement('style');
@@ -136,8 +147,64 @@ function applyTheme(theme) {
   document.head.appendChild(style);
 }
 
+function injectCustomLayout(layout) {
+  const existing = document.getElementById(LAYOUT_ID);
+  if (existing) existing.remove();
+
+  const overlay = document.createElement('div');
+  overlay.id = LAYOUT_ID;
+  overlay.style.cssText = [
+    'position:fixed;inset:0;z-index:2147483647',
+    `background:${layout.background||'#f0f2f5'}`,
+    'overflow:hidden;font-family:\'Malgun Gothic\',sans-serif',
+  ].join(';');
+
+  (layout.shapes || []).forEach(shape => {
+    const el = document.createElement(shape.link ? 'a' : 'div');
+    if (shape.link) { el.href = shape.link; el.target = '_self'; }
+    el.style.cssText = [
+      'position:absolute',
+      `left:${shape.x / 12}%`, // scale 1200px → 100vw
+      `top:${shape.y / 7}%`,   // scale 700px → 100vh
+      `width:${shape.w / 12}%`,
+      `height:${shape.h / 7}%`,
+      `background:${shape.fill||'#2a8080'}`,
+      `color:${shape.color||'#fff'}`,
+      `border-radius:${shape.borderRadius||0}px`,
+      `font-size:${(shape.fontSize||14)/12}vw`,
+      `font-weight:${shape.fontWeight||'bold'}`,
+      `border:${shape.borderWidth||0}px solid ${shape.borderColor||'transparent'}`,
+      `box-shadow:${shape.shadow?'0 2px 8px rgba(0,0,0,.2)':'none'}`,
+      'display:flex;flex-direction:column;align-items:center;justify-content:center',
+      'text-align:center;text-decoration:none;cursor:' + (shape.link ? 'pointer' : 'default'),
+      'overflow:hidden;box-sizing:border-box;padding:4px',
+      `z-index:${shape.zIndex||1}`,
+    ].join(';');
+    if (shape.icon) {
+      const ic = document.createElement('div');
+      ic.style.cssText = `font-size:${(shape.fontSize||14)*1.6/12}vw;line-height:1;margin-bottom:0.2em`;
+      ic.textContent = shape.icon;
+      el.appendChild(ic);
+    }
+    if (shape.text) {
+      const tx = document.createElement('div');
+      tx.style.cssText = `line-height:1.25;word-break:break-word`;
+      tx.textContent = shape.text;
+      el.appendChild(tx);
+    }
+    overlay.appendChild(el);
+  });
+
+  document.body.appendChild(overlay);
+}
+
+function removeCustomLayout() {
+  document.getElementById(LAYOUT_ID)?.remove();
+}
+
 function removeTheme() {
   document.getElementById(STYLE_ID)?.remove();
+  removeCustomLayout();
 }
 
 // 페이지 로드 시 자동 적용
