@@ -437,7 +437,7 @@ async function injectDirect(tab, theme) {
         ].join(';');
         (layout.shapes||[]).forEach(shape => {
           const el = document.createElement(shape.link ? 'a' : 'div');
-          if (shape.link) { el.href = shape.link; el.target = '_self'; }
+          if (shape.link) { el.href = shape.link; el.target = '_blank'; }
           const styles = [
             'position:absolute',
             `left:${shape.x/12}%`, `top:${shape.y/7}%`,
