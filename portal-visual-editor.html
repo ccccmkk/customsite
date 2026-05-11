@@ -184,6 +184,38 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
 .ctrl-inp{width:100%;background:var(--sur2);border:1px solid var(--bdr);border-radius:3px;padding:4px 7px;font-size:11px;color:var(--txt);outline:none;font-family:inherit;margin-bottom:4px}
 .ctrl-inp:focus{border-color:var(--acc)}
 .mt8{margin-top:8px}
+
+/* ── CANVAS EDITOR ── */
+#canvas-editor{flex:1;flex-direction:column;gap:8px;padding:10px;overflow:hidden;display:none}
+#canvas-editor.cv-active{display:flex}
+#canvas-scroll{flex:1;overflow:auto;padding:10px;background:#dde3ee;border-radius:4px}
+#canvas-scale-wrap{overflow:hidden;flex-shrink:0}
+#cv{width:1200px;height:700px;position:relative;transform-origin:top left;cursor:default;overflow:hidden}
+.cv-toolbar{display:flex;align-items:center;gap:5px;flex-shrink:0;flex-wrap:wrap}
+.cv-btn{height:26px;padding:0 10px;border:1px solid var(--bdr);border-radius:4px;background:var(--sur2);color:var(--txt);cursor:pointer;font-size:11px;font-family:inherit;white-space:nowrap}
+.cv-btn:hover{border-color:var(--acc);color:var(--acc)}
+.cv-btn.red{color:#ef4444;border-color:#ef4444}.cv-btn.red:hover{background:#ef4444;color:#fff}
+.cv-sep{width:1px;height:20px;background:var(--bdr);margin:0 2px;flex-shrink:0}
+.cv-shape{position:absolute;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:move;user-select:none;text-align:center;overflow:visible;box-sizing:border-box}
+.cv-shape.sel{outline:2px solid var(--acc);outline-offset:2px}
+.cv-shape .si{line-height:1;margin-bottom:2px;pointer-events:none}
+.cv-shape .st{line-height:1.25;word-break:break-word;pointer-events:none;padding:0 4px}
+.cv-handle{position:absolute;width:8px;height:8px;background:#fff;border:2px solid var(--acc);border-radius:50%;z-index:100;flex-shrink:0}
+.cv-handle[data-h=nw]{top:-5px;left:-5px;cursor:nw-resize}
+.cv-handle[data-h=n]{top:-5px;left:calc(50% - 4px);cursor:n-resize}
+.cv-handle[data-h=ne]{top:-5px;right:-5px;cursor:ne-resize}
+.cv-handle[data-h=w]{top:calc(50% - 4px);left:-5px;cursor:w-resize}
+.cv-handle[data-h=e]{top:calc(50% - 4px);right:-5px;cursor:e-resize}
+.cv-handle[data-h=sw]{bottom:-5px;left:-5px;cursor:sw-resize}
+.cv-handle[data-h=s]{bottom:-5px;left:calc(50% - 4px);cursor:s-resize}
+.cv-handle[data-h=se]{bottom:-5px;right:-5px;cursor:se-resize}
+.sli{display:flex;align-items:center;gap:5px;padding:3px 6px;border-radius:3px;cursor:pointer;font-size:11px;color:var(--txt2)}
+.sli:hover{background:var(--sur3)}.sli.sel-item{background:var(--acc);color:#fff}
+.sli .sli-ic{font-size:12px;flex-shrink:0}.sli .sli-nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.prop-row{display:flex;align-items:center;gap:6px;margin-bottom:5px}
+.prop-lbl{font-size:10px;color:var(--txt2);width:54px;flex-shrink:0}
+.prop-inp{flex:1;background:var(--sur2);border:1px solid var(--bdr);border-radius:3px;padding:3px 5px;font-size:11px;color:var(--txt);outline:none;font-family:inherit;min-width:0}
+.prop-inp:focus{border-color:var(--acc)}
 </style>
 </head>
 <body>
@@ -472,6 +504,29 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
     </div><!-- .preview-wrap -->
   </div><!-- .preview-area -->
 
+  <!-- CANVAS EDITOR (shown when canvas tab active) -->
+  <div id="canvas-editor">
+    <div class="preview-bar" style="flex-shrink:0">
+      CANVAS EDITOR &nbsp;·&nbsp; 클릭=선택 &nbsp;·&nbsp; 드래그=이동 &nbsp;·&nbsp; 핸들=리사이즈
+      &nbsp;<span id="cv-scale-val" style="color:var(--acc);font-weight:700">-</span>
+    </div>
+    <div class="cv-toolbar" style="flex-shrink:0">
+      <button class="cv-btn" onclick="addShape('rect')">＋ 도형</button>
+      <button class="cv-btn" onclick="addShape('text')">＋ 텍스트</button>
+      <div class="cv-sep"></div>
+      <button class="cv-btn" onclick="shapeLayerUp()">↑ 앞으로</button>
+      <button class="cv-btn" onclick="shapeLayerDown()">↓ 뒤로</button>
+      <div class="cv-sep"></div>
+      <button class="cv-btn" onclick="dupShape()">⧉ 복사</button>
+      <button class="cv-btn red" onclick="delShape()">🗑 삭제</button>
+    </div>
+    <div id="canvas-scroll">
+      <div id="canvas-scale-wrap">
+        <div id="cv"></div>
+      </div>
+    </div>
+  </div>
+
   <!-- CTRL PANEL -->
   <div class="ctrl">
     <div class="ctrl-tabs">
@@ -481,6 +536,7 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
       <div class="ctab" data-tab="layout" onclick="switchTab('layout')">⊞ 레이아웃</div>
       <div class="ctab" data-tab="board" onclick="switchTab('board')">📋 게시판</div>
       <div class="ctab" data-tab="css" onclick="switchTab('css')">{ } CSS</div>
+      <div class="ctab" data-tab="canvas" onclick="switchTab('canvas')">🖼 캔버스</div>
     </div>
     <div class="ctrl-scroll" id="ctrl-scroll"></div>
   </div>
@@ -517,7 +573,12 @@ const DEF = () => ({
     board_04:{hidden:false,imageData:null,mode:'overlay'},
     popzone: {hidden:false,imageData:null,mode:'overlay'}
   },
-  customCSS:''
+  customCSS:'',
+  customLayout:{
+    enabled:false,
+    background:'#f0f2f5',
+    shapes:[]
+  }
 });
 
 let theme = DEF();
@@ -681,6 +742,18 @@ function sel(e, rid) {
 function switchTab(tab) {
   currentTab = tab;
   document.querySelectorAll('.ctab').forEach(t => t.classList.toggle('active', t.dataset.tab === tab));
+  const cvEd  = document.getElementById('canvas-editor');
+  const pvWrap = document.getElementById('previewWrap');
+  if (tab === 'canvas') {
+    cvEd.classList.add('cv-active');
+    pvWrap.style.display = 'none';
+    scaleCanvas();
+    renderCanvas();
+  } else {
+    cvEd.classList.remove('cv-active');
+    pvWrap.style.display = '';
+    requestAnimationFrame(scalePreview);
+  }
   renderCtrl();
 }
 
@@ -692,6 +765,7 @@ function renderCtrl() {
   else if (currentTab === 'menu') renderMenu(s);
   else if (currentTab === 'layout') renderLayout(s);
   else if (currentTab === 'board') renderBoard(s);
+  else if (currentTab === 'canvas') renderCanvasCtrl(s);
   else renderCSS(s);
 }
 
@@ -964,6 +1038,7 @@ function handleJSONImport(e) {
       if (t.layoutConfig) Object.assign(theme.layoutConfig, t.layoutConfig);
       if (t.boardPanels) Object.assign(theme.boardPanels, t.boardPanels);
       if (t.customCSS !== undefined) theme.customCSS = t.customCSS;
+      if (t.customLayout) Object.assign(theme.customLayout, t.customLayout);
       applyTheme(); renderCtrl();
       alert('테마 불러오기 완료!');
     } catch(err) { alert('불러오기 실패: ' + err.message); }
@@ -1012,6 +1087,256 @@ function mkSel(opts, val, onchange) {
   opts.forEach(([v,l]) => { const o=mk('option'); o.value=v; o.textContent=l; if(v===val)o.selected=true; s.appendChild(o); });
   s.onchange = () => onchange(s.value);
   return s;
+}
+
+// ══════════════════════════════════════
+//  CANVAS EDITOR
+// ══════════════════════════════════════
+let cvSelId = null;
+let cvDrag  = null; // { type:'move'|'resize', shapeId, handle, startCX, startCY, startX, startY, startW, startH }
+let cvInited = false;
+
+function clientToCV(clientX, clientY) {
+  const cv = document.getElementById('cv');
+  if (!cv) return {x:0,y:0};
+  const r = cv.getBoundingClientRect();
+  const s = r.width / 1200;
+  return { x:(clientX-r.left)/s, y:(clientY-r.top)/s };
+}
+
+function initCanvas() {
+  if (cvInited) return;
+  cvInited = true;
+  const cv = document.getElementById('cv');
+  cv.addEventListener('mousedown', e => {
+    if (e.target === cv) { cvSelId=null; renderCanvas(); renderCtrl(); }
+  });
+  window.addEventListener('mousemove', e => {
+    if (!cvDrag) return;
+    const pos = clientToCV(e.clientX, e.clientY);
+    const dx = pos.x - cvDrag.startCX, dy = pos.y - cvDrag.startCY;
+    const shape = theme.customLayout.shapes.find(s => s.id === cvDrag.shapeId);
+    if (!shape) return;
+    if (cvDrag.type === 'move') {
+      shape.x = Math.max(0, Math.min(1200-shape.w, cvDrag.startX+dx));
+      shape.y = Math.max(0, Math.min(700-shape.h, cvDrag.startY+dy));
+    } else {
+      const h = cvDrag.handle;
+      let nx=cvDrag.startX, ny=cvDrag.startY, nw=cvDrag.startW, nh=cvDrag.startH;
+      if (h.includes('e')) nw = Math.max(40, cvDrag.startW+dx);
+      if (h.includes('s')) nh = Math.max(24, cvDrag.startH+dy);
+      if (h.includes('w')) { nw=Math.max(40,cvDrag.startW-dx); nx=cvDrag.startX+cvDrag.startW-nw; }
+      if (h.includes('n')) { nh=Math.max(24,cvDrag.startH-dy); ny=cvDrag.startY+cvDrag.startH-nh; }
+      shape.x=Math.max(0,nx); shape.y=Math.max(0,ny);
+      shape.w=Math.min(1200-shape.x,nw); shape.h=Math.min(700-shape.y,nh);
+    }
+    const el = document.getElementById('cvs_'+shape.id);
+    if (el) { el.style.left=shape.x+'px'; el.style.top=shape.y+'px'; el.style.width=shape.w+'px'; el.style.height=shape.h+'px'; }
+  });
+  window.addEventListener('mouseup', () => {
+    if (cvDrag) { cvDrag=null; renderCanvas(); renderCtrl(); }
+  });
+}
+
+function renderCanvas() {
+  const cv = document.getElementById('cv');
+  if (!cv) return;
+  initCanvas();
+  const layout = theme.customLayout;
+  cv.style.background = layout.background || '#f0f2f5';
+  cv.innerHTML = '';
+  (layout.shapes || []).forEach(shape => {
+    const isSel = shape.id === cvSelId;
+    const el = document.createElement('div');
+    el.className = 'cv-shape' + (isSel ? ' sel' : '');
+    el.id = 'cvs_' + shape.id;
+    el.style.cssText = `left:${shape.x}px;top:${shape.y}px;width:${shape.w}px;height:${shape.h}px;`
+      + `background:${shape.fill||'#2a8080'};color:${shape.color||'#fff'};`
+      + `border-radius:${shape.borderRadius||0}px;font-size:${shape.fontSize||14}px;`
+      + `font-weight:${shape.fontWeight||'bold'};`
+      + `border:${shape.borderWidth||0}px solid ${shape.borderColor||'transparent'};`
+      + `z-index:${shape.zIndex||1};box-shadow:${shape.shadow?'0 2px 8px rgba(0,0,0,.2)':'none'};`;
+    if (shape.icon) {
+      const ic = document.createElement('div');
+      ic.className = 'si'; ic.style.fontSize = (shape.fontSize||14)*1.6+'px'; ic.textContent = shape.icon;
+      el.appendChild(ic);
+    }
+    if (shape.text) {
+      const tx = document.createElement('div');
+      tx.className = 'st'; tx.style.fontSize = (shape.fontSize||14)+'px'; tx.textContent = shape.text;
+      el.appendChild(tx);
+    }
+    el.addEventListener('mousedown', e => {
+      e.stopPropagation();
+      cvSelId = shape.id;
+      const pos = clientToCV(e.clientX, e.clientY);
+      cvDrag = { type:'move', shapeId:shape.id, startCX:pos.x, startCY:pos.y, startX:shape.x, startY:shape.y, startW:shape.w, startH:shape.h };
+      if (!e.currentTarget.classList.contains('sel')) { renderCanvas(); renderCtrl(); }
+    });
+    if (isSel) {
+      ['nw','n','ne','w','e','sw','s','se'].forEach(h => {
+        const hd = document.createElement('div');
+        hd.className = 'cv-handle'; hd.dataset.h = h;
+        hd.addEventListener('mousedown', e => {
+          e.stopPropagation(); e.preventDefault();
+          const pos = clientToCV(e.clientX, e.clientY);
+          cvDrag = { type:'resize', shapeId:shape.id, handle:h, startCX:pos.x, startCY:pos.y, startX:shape.x, startY:shape.y, startW:shape.w, startH:shape.h };
+        });
+        el.appendChild(hd);
+      });
+    }
+    cv.appendChild(el);
+  });
+}
+
+function addShape(type) {
+  const shapes = theme.customLayout.shapes;
+  const id = 'sh_' + Math.random().toString(36).slice(2,7);
+  const offset = (shapes.length % 10) * 16;
+  shapes.push({
+    id, type,
+    x:60+offset, y:60+offset,
+    w: type==='text'?180:160, h: type==='text'?44:80,
+    fill: type==='text'?'transparent':'#2a8080',
+    color: type==='text'?'#1e293b':'#ffffff',
+    text: type==='text'?'텍스트 입력':'메뉴',
+    icon: type==='text'?'':'📋',
+    fontSize:14, fontWeight:'bold',
+    borderRadius: type==='text'?0:8,
+    borderWidth:0, borderColor:'#ccc',
+    link:'', zIndex:shapes.length+1, shadow:false
+  });
+  cvSelId = id;
+  renderCanvas(); renderCtrl();
+}
+
+function delShape() {
+  if (!cvSelId) return;
+  theme.customLayout.shapes = theme.customLayout.shapes.filter(s=>s.id!==cvSelId);
+  cvSelId = null; renderCanvas(); renderCtrl();
+}
+
+function dupShape() {
+  if (!cvSelId) return;
+  const src = theme.customLayout.shapes.find(s=>s.id===cvSelId);
+  if (!src) return;
+  const copy = JSON.parse(JSON.stringify(src));
+  copy.id = 'sh_'+Math.random().toString(36).slice(2,7);
+  copy.x += 20; copy.y += 20;
+  copy.zIndex = (theme.customLayout.shapes.length+1);
+  theme.customLayout.shapes.push(copy);
+  cvSelId = copy.id; renderCanvas(); renderCtrl();
+}
+
+function shapeLayerUp() {
+  const shapes = theme.customLayout.shapes;
+  const idx = shapes.findIndex(s=>s.id===cvSelId);
+  if (idx < shapes.length-1) { [shapes[idx],shapes[idx+1]]=[shapes[idx+1],shapes[idx]]; renderCanvas(); renderCtrl(); }
+}
+
+function shapeLayerDown() {
+  const shapes = theme.customLayout.shapes;
+  const idx = shapes.findIndex(s=>s.id===cvSelId);
+  if (idx > 0) { [shapes[idx],shapes[idx-1]]=[shapes[idx-1],shapes[idx]]; renderCanvas(); renderCtrl(); }
+}
+
+function renderCanvasCtrl(cont) {
+  const layout = theme.customLayout;
+
+  const h1 = mk('div','sec-hd'); h1.textContent='캔버스 설정'; cont.appendChild(h1);
+  cont.appendChild(mkTog('포털에서 활성화 (전체 화면 교체)', layout.enabled||false, v=>{layout.enabled=v;}));
+  const hint = mk('div','hint-text'); hint.style.marginTop='4px';
+  hint.textContent='활성화 시 포털 진입 즉시 이 캔버스 화면으로 전환됩니다.';
+  cont.appendChild(hint);
+
+  const bgRow = mk('div','prop-row'); bgRow.style.marginTop='8px';
+  const bgL = mk('span','prop-lbl'); bgL.textContent='배경색';
+  const bgCp = mk('input'); bgCp.type='color'; bgCp.value=layout.background||'#f0f2f5';
+  const bgHx = mk('input','hex-inp'); bgHx.value=layout.background||'#f0f2f5'; bgHx.maxLength=7;
+  bgCp.oninput=()=>{ bgHx.value=bgCp.value; layout.background=bgCp.value; renderCanvas(); };
+  bgHx.oninput=()=>{ const v=bgHx.value.trim(); if(/^#[0-9a-fA-F]{6}$/.test(v)){bgCp.value=v;layout.background=v;renderCanvas();} };
+  bgRow.append(bgL,bgCp,bgHx); cont.appendChild(bgRow);
+
+  // Shape list
+  const h2 = mk('div','sec-hd'); h2.style.marginTop='12px'; h2.textContent='도형 목록 ('+layout.shapes.length+')'; cont.appendChild(h2);
+  if (!layout.shapes.length) {
+    const em=mk('div','hint-text'); em.textContent='도형이 없습니다. 상단 ＋ 버튼으로 추가하세요.'; cont.appendChild(em);
+  } else {
+    layout.shapes.slice().reverse().forEach((shape,ri) => {
+      const item = mk('div','sli'+(shape.id===cvSelId?' sel-item':''));
+      const ic=mk('span','sli-ic'); ic.textContent=shape.icon||'▭';
+      const nm=mk('span','sli-nm'); nm.textContent=shape.text||(shape.icon?'':'도형');
+      item.append(ic,nm); item.onclick=()=>{cvSelId=shape.id;renderCanvas();renderCtrl();};
+      cont.appendChild(item);
+    });
+  }
+
+  // Selected shape properties
+  const shape = layout.shapes.find(s=>s.id===cvSelId);
+  if (shape) {
+    const h3=mk('div','sec-hd'); h3.style.marginTop='12px'; h3.textContent='도형 속성'; cont.appendChild(h3);
+
+    // Text + Icon + Link
+    [
+      {lbl:'텍스트', key:'text', ph:'버튼 이름'},
+      {lbl:'아이콘', key:'icon', ph:'이모지 (✉ 📋 👤)'},
+      {lbl:'링크 URL', key:'link', ph:'http://dauri.moel.go.kr/...'},
+    ].forEach(({lbl,key,ph}) => {
+      const row=mk('div','prop-row');
+      const l=mk('span','prop-lbl'); l.textContent=lbl;
+      const inp=mk('input','prop-inp'); inp.type='text'; inp.value=shape[key]||''; inp.placeholder=ph||'';
+      inp.oninput=()=>{shape[key]=inp.value; renderCanvas();};
+      row.append(l,inp); cont.appendChild(row);
+    });
+
+    // Number props
+    [
+      {lbl:'글자 크기', key:'fontSize', min:8, max:72, step:1},
+      {lbl:'둥글기', key:'borderRadius', min:0, max:200, step:1},
+      {lbl:'테두리', key:'borderWidth', min:0, max:10, step:1},
+    ].forEach(({lbl,key,min,max,step}) => {
+      const row=mk('div','prop-row');
+      const l=mk('span','prop-lbl'); l.textContent=lbl;
+      const inp=mk('input','prop-inp'); inp.type='number'; inp.min=min; inp.max=max; inp.step=step||1;
+      inp.value=shape[key]!==undefined?shape[key]:'';
+      inp.oninput=()=>{shape[key]=parseInt(inp.value)||0; renderCanvas();};
+      row.append(l,inp); cont.appendChild(row);
+    });
+
+    // Color rows
+    [{lbl:'채우기',key:'fill'},{lbl:'텍스트 색',key:'color'},{lbl:'테두리 색',key:'borderColor'}].forEach(({lbl,key})=>{
+      const row=mk('div','color-row');
+      const l=mk('label','color-label'); l.textContent=lbl;
+      const cp=mk('input'); cp.type='color'; cp.value=shape[key]||'#000000';
+      const hx=mk('input','hex-inp'); hx.value=shape[key]||'#000000'; hx.maxLength=7;
+      cp.oninput=()=>{hx.value=cp.value;shape[key]=cp.value;renderCanvas();};
+      hx.oninput=()=>{const v=hx.value.trim();if(/^#[0-9a-fA-F]{6}$/.test(v)){cp.value=v;shape[key]=v;renderCanvas();}};
+      row.append(l,cp,hx); cont.appendChild(row);
+    });
+
+    // Bold + Shadow toggles
+    cont.appendChild(mkTog('굵게', shape.fontWeight==='bold', v=>{shape.fontWeight=v?'bold':'normal';renderCanvas();}));
+    cont.appendChild(mkTog('그림자', shape.shadow||false, v=>{shape.shadow=v;renderCanvas();}));
+
+    const delBtn=mk('button','tb-btn');
+    delBtn.style.cssText='width:100%;margin-top:8px;color:#ef4444;border-color:#ef4444';
+    delBtn.textContent='🗑 이 도형 삭제';
+    delBtn.onclick=delShape; cont.appendChild(delBtn);
+  }
+}
+
+function scaleCanvas() {
+  const scroll = document.getElementById('canvas-scroll');
+  const wrap   = document.getElementById('canvas-scale-wrap');
+  const cv     = document.getElementById('cv');
+  if (!scroll||!cv) return;
+  const aw = scroll.clientWidth - 20;
+  const s  = Math.min(aw/1200, 1);
+  cv.style.transform = `scale(${s})`;
+  cv.style.transformOrigin = 'top left';
+  if (wrap) { wrap.style.width=Math.round(1200*s)+'px'; wrap.style.height=Math.round(700*s)+'px'; }
+  const sv=document.getElementById('cv-scale-val');
+  if (sv) sv.textContent = Math.round(s*100)+'%';
 }
 
 // ══════════════════════════════════════
