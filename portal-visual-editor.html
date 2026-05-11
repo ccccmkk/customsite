@@ -37,83 +37,94 @@ body{background:var(--bg);color:var(--txt);font-family:-apple-system,'Malgun Got
 .ps.sel{outline:2px solid #3b82f6!important;outline-offset:-2px}
 
 /* Header base */
-#portal-preview header#header{}
-#portal-preview header#header>div.inner{background:#1a3a6e;height:44px;display:flex;align-items:center;padding:0 16px;gap:12px}
-#portal-preview .logo-text{color:#fff;font-size:17px;font-weight:900;letter-spacing:.05em}
-#portal-preview .topNavi{margin-left:auto}
-#portal-preview .topNavi ul{display:flex;gap:6px;align-items:center}
-#portal-preview .topNavi li{font-size:11px;color:rgba(255,255,255,.85);padding:3px 8px;border-radius:3px;cursor:pointer;white-space:nowrap}
-#portal-preview .topNavi li:hover{background:rgba(255,255,255,.15)}
-#portal-preview .topNavi button{background:none;color:rgba(255,255,255,.8);font-size:12px}
-#portal-preview header nav{background:#0f2744}
-#portal-preview div#lnb>div.inner{display:flex;height:42px;align-items:center;padding:0 12px}
-#portal-preview ul.topmenu{display:flex;height:100%;align-items:center;gap:2px}
-#portal-preview ul.topmenu>li{padding:6px 14px;color:rgba(255,255,255,.85);font-size:12px;font-weight:600;cursor:pointer;border-radius:3px;white-space:nowrap}
+#portal-preview header#header{background:#fff;border-bottom:1px solid #e0e0e0}
+#portal-preview header#header>div.inner{background:#fff;height:52px;display:flex;align-items:center;padding:0 16px;gap:10px;border-bottom:1px solid #ebebeb}
+#portal-preview .logo-wrap{display:flex;align-items:center;gap:6px;flex-shrink:0}
+#portal-preview .logo-img{width:28px;height:28px;background:radial-gradient(circle at 40% 40%,#c00,#800);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;font-weight:900}
+#portal-preview .logo-text{color:#1a3a6e;font-size:16px;font-weight:900;letter-spacing:.02em}
+#portal-preview .afw-header-search{flex:1;display:flex;justify-content:center}
+#portal-preview .afw-header-search .afw-search-box{display:flex;align-items:center;width:340px;height:32px;border:1.5px solid #2a8080;border-radius:20px;padding:0 12px;gap:6px;background:#fff}
+#portal-preview .afw-header-search .afw-search-box span{flex:1;font-size:11px;color:#aaa}
+#portal-preview .afw-header-search .afw-search-box .shortcut{background:#f0f0f0;border-radius:3px;padding:1px 5px;font-size:9px;color:#888;font-family:monospace}
+#portal-preview .afw-header-search .afw-search-box .go-btn{width:24px;height:24px;background:#2a8080;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-size:11px;flex-shrink:0}
+#portal-preview .topNavi{display:flex;align-items:center;gap:5px;flex-shrink:0}
+#portal-preview .topNavi a,.portal-preview .topNavi button{font-size:11px;color:#555;cursor:pointer;white-space:nowrap;background:none;padding:0}
+#portal-preview .header-btns{display:flex;gap:4px;align-items:center}
+#portal-preview .header-btn{height:26px;padding:0 10px;border:1px solid #2a8080;border-radius:13px;font-size:11px;color:#2a8080;background:#fff;cursor:pointer;white-space:nowrap;font-weight:600}
+#portal-preview .header-btn.dark{border-color:#888;color:#555}
+#portal-preview .header-user{font-size:11px;color:#333;white-space:nowrap;font-weight:600}
+#portal-preview header nav{background:#2a8080}
+#portal-preview div#lnb>div.inner{display:flex;height:40px;align-items:center;padding:0 16px}
+#portal-preview ul.topmenu{display:flex;height:100%;align-items:center;gap:0}
+#portal-preview ul.topmenu>li{padding:0 28px;color:rgba(255,255,255,.9);font-size:13px;font-weight:600;cursor:pointer;height:100%;display:flex;align-items:center;white-space:nowrap;border-right:1px solid rgba(255,255,255,.15)}
+#portal-preview ul.topmenu>li:first-child{border-left:none}
 #portal-preview ul.topmenu>li.on,#portal-preview ul.topmenu>li:hover{background:rgba(255,255,255,.15);color:#fff}
 #portal-preview div.inner.darkGnbWrap{display:none}
 #portal-preview div.menu_allArea{display:none}
 
 /* con_01 */
-#portal-preview section.con_01{padding:12px 16px;display:flex;gap:10px;background:#f5f7f9}
-#portal-preview div.menu_infoArea{display:flex;gap:8px;flex:1;min-width:0}
-#portal-preview div.menu_infoArea>div{background:#fff;border:1px solid #dde3ea;border-radius:4px;flex:1;min-width:0;overflow:hidden}
-#portal-preview div.menu_infoArea>div h4{background:#3b5998;color:#fff;padding:6px 10px;font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:4px}
+#portal-preview section.con_01{padding:10px 16px;display:flex;gap:8px;background:#f0f2f5}
+#portal-preview div.menu_infoArea{display:flex;gap:6px;flex:1;min-width:0}
+#portal-preview div.menu_infoArea>div{background:#fff;border:1px solid #d0d7de;flex:1;min-width:0;overflow:hidden}
+#portal-preview div.menu_infoArea>div h4{background:#2a8080;color:#fff;padding:5px 8px;font-size:11px;display:flex;justify-content:space-between;align-items:center;gap:4px}
 #portal-preview div.menu_infoArea>div h4 a{color:inherit}
-#portal-preview .btnSmallA{background:#0a808f;color:#fff;border-radius:3px;padding:2px 7px;font-size:10px}
-#portal-preview .btnSmallA_01{background:#0a808f;color:#fff;border-radius:3px;padding:2px 7px;font-size:10px}
-#portal-preview .btnSmall{background:#435a7c;color:#fff;border-radius:3px;padding:2px 7px;font-size:10px}
+#portal-preview .btnSmallA{background:#2a8080;color:#fff;border-radius:10px;padding:2px 8px;font-size:10px;font-weight:600}
+#portal-preview .btnSmallA_01{background:#fff;color:#2a8080;border:1px solid #2a8080;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600}
+#portal-preview .btnSmall{background:#fff;color:#555;border:1px solid #ccc;border-radius:3px;padding:1px 6px;font-size:10px}
 #portal-preview .btnreset{background:#2d7ee1;color:#fff;border-radius:3px;padding:2px 7px;font-size:10px}
-#portal-preview .btnAll{background:#3b82f6;color:#fff;border-radius:3px;padding:2px 7px;font-size:10px}
-#portal-preview div.menu_infoArea ul{padding:3px 0}
-#portal-preview div.menu_infoArea ul li{padding:3px 10px;font-size:10px;color:#444;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f5f7f9;gap:4px}
+#portal-preview .btnAll{background:#fff;color:#2a8080;border:1px solid #2a8080;border-radius:3px;padding:1px 6px;font-size:10px;font-weight:600}
+#portal-preview div.menu_infoArea ul{padding:2px 0}
+#portal-preview div.menu_infoArea ul li{padding:4px 8px;font-size:11px;color:#333;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #f0f2f5;gap:4px}
 #portal-preview div.menu_infoArea ul li:hover{background:#f8fafc}
-#portal-preview div.menuText{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#portal-preview div.menuRight{color:#888;font-size:10px;flex-shrink:0}
-#portal-preview div.menuRight span.on{color:#0a808f;font-weight:700}
-#portal-preview div.popzone{width:180px;background:#fff;border:1px solid #dde3ea;border-radius:4px;overflow:hidden;flex-shrink:0}
-#portal-preview div.popzone .popTitle{background:#1a3a6e;color:#fff;padding:6px 10px;font-size:11px;display:flex;justify-content:space-between;align-items:center}
-#portal-preview div.popzone .popTitle h5{font-size:11px}
+#portal-preview div.menuText{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#333}
+#portal-preview div.menuRight{color:#2a8080;font-size:11px;flex-shrink:0;font-weight:600}
+#portal-preview div.menuRight span.on{color:#2a8080;font-weight:700}
+#portal-preview div.popzone{width:190px;background:#fff;border:1px solid #d0d7de;overflow:hidden;flex-shrink:0}
+#portal-preview div.popzone .popTitle{background:#2a8080;color:#fff;padding:5px 10px;font-size:11px;display:flex;justify-content:space-between;align-items:center}
+#portal-preview div.popzone .popTitle h5{font-size:11px;font-weight:700}
 #portal-preview div.popzone .popBtn{display:flex;gap:3px}
-#portal-preview div.popzone .popBtn button{background:rgba(255,255,255,.2);color:#fff;border-radius:2px;padding:1px 5px;font-size:10px}
-#portal-preview div.popzone .popImg{padding:8px}
-#portal-preview div.popzone .popImg a{display:block;height:90px;background:linear-gradient(135deg,#e2e8f0,#cbd5e1);border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:10px;color:#64748b}
+#portal-preview div.popzone .popBtn button{background:rgba(255,255,255,.25);color:#fff;border-radius:2px;padding:1px 5px;font-size:10px}
+#portal-preview div.popzone .popImg{padding:6px}
+#portal-preview div.popzone .popImg a{display:block;height:110px;background:linear-gradient(135deg,#e8edf2,#cdd5de);display:flex;align-items:center;justify-content:center;font-size:10px;color:#64748b}
 
 /* con_02 */
-#portal-preview section.con_02{display:flex;gap:10px;padding:0 16px 12px}
-#portal-preview div#noticeZone.boardArea{flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:8px}
-#portal-preview .notice1,.portal-preview .notice2{background:#fff;border:1px solid #dde3ea;border-radius:4px;overflow:hidden;position:relative}
-#portal-preview .notice1{background:#fff;border:1px solid #dde3ea;border-radius:4px;overflow:hidden;position:relative}
-#portal-preview .notice2{background:#fff;border:1px solid #dde3ea;border-radius:4px;overflow:hidden;position:relative}
-#portal-preview .board_title{background:#f8fafc;border-bottom:1px solid #e2e8f0}
-#portal-preview .board_title ul{display:flex;flex-wrap:nowrap;overflow:hidden}
-#portal-preview .board_title ul li{padding:6px 10px;font-size:10px;font-weight:600;color:#64748b;cursor:pointer;white-space:nowrap;border-right:1px solid #e2e8f0;flex-shrink:0}
-#portal-preview .board_title ul li.on,.portal-preview .board_title ul li:hover{color:#1a3a6e;background:#fff}
-#portal-preview .board_title ul li.more{margin-left:auto;border-right:none;color:var(--acc)}
+#portal-preview section.con_02{display:flex;gap:8px;padding:0 16px 12px}
+#portal-preview div#noticeZone.boardArea{flex:1;min-width:0;display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#portal-preview .notice1{background:#fff;border:1px solid #d0d7de;overflow:hidden;position:relative}
+#portal-preview .notice2{background:#fff;border:1px solid #d0d7de;overflow:hidden;position:relative}
+#portal-preview .board_title{background:#fff;border-bottom:1px solid #e0e0e0}
+#portal-preview .board_title ul{display:flex;flex-wrap:nowrap;overflow:hidden;align-items:stretch}
+#portal-preview .board_title ul li{padding:7px 10px;font-size:11px;font-weight:600;color:#555;cursor:pointer;white-space:nowrap;flex-shrink:0;border-right:1px solid #eee;display:flex;align-items:center;gap:4px}
+#portal-preview .board_title ul li.on{background:#2a8080;color:#fff}
+#portal-preview .board_title ul li.on .plus-btn{background:rgba(255,255,255,.3);color:#fff}
+#portal-preview .board_title ul li:not(.on):hover{background:#f5f5f5}
+#portal-preview .board_title ul li.more{margin-left:auto;border-right:none;color:#888;font-weight:400;font-size:10px}
+#portal-preview .plus-btn{width:14px;height:14px;background:#e0e0e0;border-radius:2px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;color:#666;flex-shrink:0}
 #portal-preview .boardTabLink{color:inherit}
-#portal-preview ul.bd_list{padding:3px 0}
-#portal-preview ul.bd_list>li{padding:3px 10px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #f8fafc;font-size:10px}
-#portal-preview ul.bd_list>li:hover{background:#f8fafc}
-#portal-preview span.list_txt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#334155}
-#portal-preview span.list_date{font-size:9px;color:#94a3b8;white-space:nowrap;flex-shrink:0}
+#portal-preview ul.bd_list{padding:2px 0}
+#portal-preview ul.bd_list>li{padding:4px 10px;display:flex;align-items:center;gap:6px;border-bottom:1px solid #f5f5f5;font-size:11px}
+#portal-preview ul.bd_list>li:hover{background:#fafafa}
+#portal-preview span.list_txt{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#333}
+#portal-preview span.list_date{font-size:10px;color:#999;white-space:nowrap;flex-shrink:0}
 
 /* rightContents */
-#portal-preview div.rightContents{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:8px}
-#portal-preview div#aiFinderWidget{background:linear-gradient(135deg,#1a3a6e,#0f2744);border-radius:4px;padding:10px}
-#portal-preview div#aiFinderWidget .afw-head{color:rgba(255,255,255,.95);font-size:11px;font-weight:700;margin-bottom:7px}
-#portal-preview div#aiFinderWidget .afw-bar{display:flex;gap:4px}
-#portal-preview div#aiFinderWidget input{flex:1;height:26px;border-radius:4px;border:none;padding:0 8px;font-size:10px;font-family:inherit}
-#portal-preview .afw-chips{margin-top:6px;display:flex;gap:4px;flex-wrap:wrap}
-#portal-preview .afw-chip{background:rgba(255,255,255,.2);color:#fff;padding:2px 8px;border-radius:10px;font-size:10px;cursor:pointer}
-#portal-preview div.myLink{background:#fff;border:1px solid #dde3ea;border-radius:4px;padding:8px}
-#portal-preview div.myLink h5{font-size:11px;color:#1e293b;margin-bottom:6px;display:flex;align-items:center}
-#portal-preview div.myLink h5 a{margin-left:auto}
-#portal-preview div.myLink .link_area ul{display:flex;flex-wrap:wrap;gap:4px}
-#portal-preview div.myLink .link_area ul li{background:#f1f5f9;border-radius:3px;padding:3px 8px;font-size:10px;color:#475569;cursor:pointer}
-#portal-preview div.myLink .link_area ul li:hover{background:#e2e8f0}
-#portal-preview div.dauri_faq{background:#fff;border:1px solid #dde3ea;border-radius:4px;padding:8px}
-#portal-preview div.dauri_faq h5{font-size:10px;color:#475569;cursor:pointer;padding:4px 0;border-bottom:1px solid #f1f5f9;display:flex;align-items:center;gap:4px}
-#portal-preview div.dauri_faq h5:hover{color:var(--acc)}
-#portal-preview .helpdesk_info{margin-top:6px;padding:5px 8px;background:#f8fafc;border-radius:3px;font-size:9px;color:#64748b;border:1px solid #e2e8f0}
+#portal-preview div.rightContents{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:6px}
+#portal-preview div.myLink{background:#fff;border:1px solid #d0d7de;padding:8px}
+#portal-preview div.myLink .mylink-hd{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+#portal-preview div.myLink .mylink-hd span{font-size:12px;font-weight:700;color:#333}
+#portal-preview div.myLink .mylink-hd-btns{display:flex;gap:4px}
+#portal-preview div.myLink .link_area{padding:2px 0}
+#portal-preview div.myLink .link_area ul{display:flex;flex-direction:column;gap:0}
+#portal-preview div.myLink .link_area ul li{padding:4px 4px;font-size:11px;color:#1a7a7a;cursor:pointer;border-bottom:1px solid #f5f5f5}
+#portal-preview div.myLink .link_area ul li a{color:#1a7a7a}
+#portal-preview div.myLink .link_area ul li:hover{background:#f5f5f5}
+#portal-preview div.myLink .mylink-page{display:flex;justify-content:flex-end;align-items:center;gap:4px;margin-top:4px;font-size:10px;color:#888}
+#portal-preview div.myLink .mylink-page button{background:#fff;border:1px solid #ccc;border-radius:2px;padding:1px 5px;font-size:10px;color:#666;cursor:pointer}
+#portal-preview div.dauri_faq{background:#fff;border:1px solid #d0d7de;padding:8px}
+#portal-preview div.dauri_faq .faq-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
+#portal-preview div.dauri_faq .faq-item{padding:5px 6px;background:#f5f7f9;font-size:11px;color:#333;cursor:pointer;text-align:center}
+#portal-preview div.dauri_faq .faq-item:hover{background:#e8edf2}
+#portal-preview .helpdesk_info{padding:5px 8px;background:#f0f2f5;font-size:10px;color:#555;text-align:center}
 
 /* footer */
 #portal-preview footer#footer{background:#1a3a6e;color:rgba(255,255,255,.75);padding:10px 16px;font-size:10px}
@@ -202,19 +213,33 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
           <!-- ── HEADER ── -->
           <header id="header" class="ps" data-r="header" onclick="sel(event,'header')">
             <div class="inner ps" data-r="header-inner" onclick="sel(event,'header-inner')">
-              <h1 class="logo"><span class="logo-text">다우리</span></h1>
+              <h1 class="logo">
+                <div class="logo-wrap">
+                  <div class="logo-img">🇰🇷</div>
+                  <span class="logo-text">다우리</span>
+                </div>
+              </h1>
+              <div class="afw-header-search">
+                <div class="afw-search-box">
+                  <span>AI 직원 검색 (Ctrl+I)</span>
+                  <span class="shortcut">Ctrl+I</span>
+                  <div class="go-btn">▶</div>
+                </div>
+              </div>
               <div class="topNavi">
-                <ul class="gnb">
-                  <li class="workArea">🕐 출퇴근</li>
-                  <li class="color1">홍길동 (gildong)</li>
-                  <li><a href="#">로그아웃</a></li>
-                  <li><a href="#">개인설정</a></li>
-                  <li class="themeToggle"><button id="themeToggleBtn">🌙</button></li>
-                  <li class="color2">소속기관관리자</li>
-                  <li class="color3">직원검색</li>
-                  <li class="color4"><a href="#">게시판검색</a></li>
-                  <li id="afwHeaderBar"><a href="#">AI직원검색</a></li>
-                </ul>
+                <div class="header-btns">
+                  <button class="header-btn">직원검색</button>
+                  <button class="header-btn">게시판검색</button>
+                  <button class="header-btn">관할구역</button>
+                  <button class="header-btn">소속기관별 관리자</button>
+                  <button class="header-btn dark">다크모드</button>
+                </div>
+                <span style="margin:0 6px;color:#ccc">|</span>
+                <span class="header-user">○○○ [온나라ID/○○○○○○○]</span>
+                <span style="margin:0 6px;color:#ccc">|</span>
+                <a href="#" style="font-size:11px;color:#555">개인설정</a>
+                <span style="margin:0 4px;color:#ccc">|</span>
+                <a href="#" style="font-size:11px;color:#555">로그아웃</a>
               </div>
             </div>
             <div class="cr"></div>
@@ -224,7 +249,7 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
                 <li><a href="#">관리</a></li>
                 <li><a href="#">알림</a></li>
                 <li><a href="#">소통·지원</a></li>
-                <li><a href="#">온나라지식</a></li>
+                <li><a href="#">온나라 지식 ρ</a></li>
               </ul></div></div>
               <div class="inner darkGnbWrap"><ul class="darkGnbList">
                 <li class="darkGnbItem">온나라</li>
@@ -240,52 +265,52 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
             <div class="menu_infoArea ps" data-r="menu-area" onclick="sel(event,'menu-area')">
 
               <div class="menu01 ps" data-r="menu01" onclick="sel(event,'menu01')">
-                <h4><a href="#">메일</a><button class="btnSmallA">go</button></h4>
+                <h4><a href="#">✉ 메일</a><button class="btnSmallA">go</button></h4>
                 <ul>
-                  <li><div class="menuText"><a href="#">[받은메일] 읽지않은 메일</a></div><div class="menuRight">3</div></li>
-                  <li><div class="menuText"><a href="#">[보낸메일] 최근 발송</a></div><div class="menuRight">1</div></li>
-                  <li><div class="menuText"><a href="#">[임시저장] 작성중</a></div><div class="menuRight">0</div></li>
-                  <li><div class="menuText"><a href="#">새 메일 작성</a></div><div class="menuRight"><button class="btnSmallA">작성</button></div></li>
+                  <li><div class="menuText"><a href="#">편지쓰기</a></div><div class="menuRight"><button class="btnSmallA">go</button></div></li>
+                  <li><div class="menuText"><a href="#">새편지</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">온-나라메일</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">KMC메일</a></div><div class="menuRight">0 건</div></li>
                 </ul>
               </div>
 
               <div class="menu02 ps" data-r="menu02" onclick="sel(event,'menu02')">
-                <h4><a href="#">온-나라</a><button class="btnSmallA_01">설정</button></h4>
+                <h4><a href="#">📋 온-나라</a><button class="btnSmallA_01">설정</button></h4>
                 <ul id="indexBms">
-                  <li><div class="menuText"><a href="#">결재대기</a></div><div class="menuRight"><span class="on">5</span></div></li>
-                  <li><div class="menuText"><a href="#">기안문서</a></div><div class="menuRight">2</div></li>
-                  <li><div class="menuText"><a href="#">반송문서</a></div><div class="menuRight">0</div></li>
-                  <li><div class="menuText"><a href="#">전자문서함</a></div><div class="menuRight"><button class="btnSmall">열기</button></div></li>
+                  <li><div class="menuText"><a href="#">공유공람</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">접수대기</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">발송처리</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">메모보고</a></div><div class="menuRight">0 건</div></li>
                 </ul>
               </div>
 
               <div class="menu03 ps" data-r="menu03" onclick="sel(event,'menu03')">
-                <h4><a href="#">e-사람</a></h4>
+                <h4><a href="#">🖥 e-사람</a></h4>
                 <ul>
-                  <li><div class="menuText"><a href="#">근태현황</a></div><div class="menuRight">-</div></li>
-                  <li><div class="menuText"><a href="#">휴가잔여</a></div><div class="menuRight">15일</div></li>
-                  <li><div class="menuText"><a href="#">급여명세</a></div><div class="menuRight"><button class="btnSmall">조회</button></div></li>
-                  <li><div class="menuText"><a href="#">인사발령</a></div><div class="menuRight">-</div></li>
+                  <li><div class="menuText"><a href="#">결재</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">초과사전신청</a></div><div class="menuRight"><button class="btnSmallA">go</button></div></li>
+                  <li><div class="menuText"><a href="#">출퇴근지정</a></div><div class="menuRight"><button class="btnSmallA">go</button></div></li>
+                  <li><div class="menuText"><a href="#">근무지내출장</a></div><div class="menuRight"><button class="btnSmallA">go</button></div></li>
                 </ul>
               </div>
 
               <div class="menu04 ps" data-r="menu04" onclick="sel(event,'menu04')">
                 <h4>/<a href="#">배우리</a>/<a href="#">문자발송</a></h4>
                 <ul>
-                  <li><div class="menuText"><a href="#">학습진도</a></div><div class="menuRight">70%</div></li>
-                  <li><div class="menuText"><a href="#">신청강좌</a></div><div class="menuRight">2</div></li>
-                  <li><div class="menuText"><a href="#">문자 보내기</a></div><div class="menuRight"><button class="btnSmall">go</button></div></li>
-                  <li><div class="menuText"><a href="#">수료증 발급</a></div><div class="menuRight">-</div></li>
+                  <li><div class="menuText"><a href="#">수강신청승인</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">학습시간승인</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">외부강의·회의</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">문자 발송</a></div><div class="menuRight"><button class="btnSmallA">go</button></div></li>
                 </ul>
               </div>
 
               <div class="menu05 ps" data-r="menu05" onclick="sel(event,'menu05')">
-                <h4><a href="#">노사누리</a></h4>
+                <h4><a href="#">💬 노사누리</a></h4>
                 <ul>
-                  <li><div class="menuText"><a href="#">공지사항</a></div><div class="menuRight">NEW</div></li>
-                  <li><div class="menuText"><a href="#">복지포인트</a></div><div class="menuRight">120P</div></li>
-                  <li><div class="menuText"><a href="#">자주쓰는메뉴</a></div><div class="menuRight">-</div></li>
-                  <li><div class="menuText"><a href="#">복지몰 바로가기</a></div><div class="menuRight"><button class="btnSmall">이동</button></div></li>
+                  <li><div class="menuText"><a href="#">나의업무</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">등록 대기</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">민원인 제출자료</a></div><div class="menuRight">0 건</div></li>
+                  <li><div class="menuText"><a href="#">노사누리 결재</a></div><div class="menuRight">0 건</div></li>
                 </ul>
               </div>
 
@@ -311,34 +336,34 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
 
               <div class="notice1 board_01 ps" data-r="board_01" onclick="sel(event,'board_01')">
                 <div class="board_title"><ul>
-                  <li class="noticeTab_1 on"><a class="boardTabLink" href="#">정책공지</a></li>
+                  <li class="noticeTab_1 on"><span class="plus-btn">+</span><a class="boardTabLink" href="#">정책공지</a></li>
                   <li class="noticeTab_1"><a class="boardTabLink" href="#">교육공지</a></li>
                   <li class="noticeTab_1"><a class="boardTabLink" href="#">일반공지</a></li>
-                  <li class="noticeTab_1"><a class="boardTabLink" href="#">인사(6급↓)</a></li>
-                  <li class="more"><a href="#" class="boardTabMore">더보기+</a></li>
+                  <li class="noticeTab_1"><a class="boardTabLink" href="#">인사(6급이하)</a></li>
+                  <li class="more"><a href="#" class="boardTabMore">더보기</a></li>
                 </ul></div>
                 <ul class="bd_list">
-                  <li><span class="list_txt"><a href="#">2026년 고용노동부 주요정책 안내</a></span><span class="list_date">05-10</span></li>
-                  <li><span class="list_txt"><a href="#">직원 교육훈련 신청 안내</a></span><span class="list_date">05-09</span></li>
-                  <li><span class="list_txt"><a href="#">하반기 인사이동 계획 공고</a></span><span class="list_date">05-08</span></li>
-                  <li><span class="list_txt"><a href="#">개인정보 보호 교육 안내</a></span><span class="list_date">05-07</span></li>
-                  <li><span class="list_txt"><a href="#">청사 방역 및 위생 관리 안내</a></span><span class="list_date">05-06</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
                 </ul>
               </div>
 
               <div class="notice1 board_02 ps" data-r="board_02" onclick="sel(event,'board_02')">
                 <div class="board_title"><ul>
-                  <li class="on"><a class="boardTabLink" href="#">오늘의 보도자료</a></li>
+                  <li class="on"><span class="plus-btn">+</span><a class="boardTabLink" href="#">오늘의 보도자료</a></li>
                   <li><a class="boardTabLink" href="#">보도·설명자료</a></li>
                   <li><a class="boardTabLink" href="#">홍보물창고</a></li>
-                  <li class="more"><a href="#">더보기+</a></li>
+                  <li class="more"><a href="#">더보기</a></li>
                 </ul></div>
                 <ul class="bd_list">
-                  <li><span class="list_txt"><a href="#">고용률 통계 보도자료 (2026.05)</a></span><span class="list_date">05-10</span></li>
-                  <li><span class="list_txt"><a href="#">최저임금 설명자료</a></span><span class="list_date">05-09</span></li>
-                  <li><span class="list_txt"><a href="#">홍보물 제작 가이드라인</a></span><span class="list_date">05-07</span></li>
-                  <li><span class="list_txt"><a href="#">노동시장 동향 월간 브리핑</a></span><span class="list_date">05-06</span></li>
-                  <li><span class="list_txt"><a href="#">산재보험 개선안 보도 설명</a></span><span class="list_date">05-05</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
                 </ul>
               </div>
 
@@ -348,14 +373,14 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
                   <li><a class="boardTabLink" href="#">서울청소식</a></li>
                   <li><a class="boardTabLink" href="#">지식SOS</a></li>
                   <li><a class="boardTabLink" href="#">재난안전</a></li>
-                  <li class="more"><a href="#">더보기+</a></li>
+                  <li class="more"><a href="#">더보기</a></li>
                 </ul></div>
                 <ul class="bd_list">
-                  <li><span class="list_txt"><a href="#">부내 행사일정 안내</a></span><span class="list_date">05-10</span></li>
-                  <li><span class="list_txt"><a href="#">서울청 회의 결과 공유</a></span><span class="list_date">05-08</span></li>
-                  <li><span class="list_txt"><a href="#">지식공유 SOS 답변</a></span><span class="list_date">05-07</span></li>
-                  <li><span class="list_txt"><a href="#">재난대응 훈련 일정</a></span><span class="list_date">05-06</span></li>
-                  <li><span class="list_txt"><a href="#">청사 안전점검 결과</a></span><span class="list_date">05-05</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
                 </ul>
               </div>
 
@@ -365,50 +390,53 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
                   <li><a class="boardTabLink" href="#">장터마당</a></li>
                   <li><a class="boardTabLink" href="#">경조사</a></li>
                   <li><a class="boardTabLink" href="#">백인백색</a></li>
-                  <li class="more"><a href="#">더보기+</a></li>
+                  <li class="more"><a href="#">더보기</a></li>
                 </ul></div>
                 <ul class="bd_list">
-                  <li><span class="list_txt"><a href="#">엑셀 매크로 활용 노하우</a></span><span class="list_date">05-09</span></li>
-                  <li><span class="list_txt"><a href="#">사무용품 공동구매</a></span><span class="list_date">05-08</span></li>
-                  <li><span class="list_txt"><a href="#">김○○ 결혼 경조사 안내</a></span><span class="list_date">05-07</span></li>
-                  <li><span class="list_txt"><a href="#">업무 자동화 팁 공유</a></span><span class="list_date">05-06</span></li>
-                  <li><span class="list_txt"><a href="#">나만의 일처리 방법</a></span><span class="list_date">05-05</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
+                  <li><span class="list_txt"><a href="#">○○○○○○○○○○○○○○○○○○○○○○</a></span><span class="list_date">○○.○○</span></li>
                 </ul>
               </div>
 
             </div><!-- #noticeZone -->
 
             <div class="rightContents ps" data-r="right" onclick="sel(event,'right')">
-              <div id="aiFinderWidget" class="ai-finder-widget">
-                <div class="afw-head">✦ AI 직원 검색</div>
-                <div class="afw-body"><div class="afw-bar">
-                  <input id="afwInput" placeholder="이름 또는 소속으로 검색...">
-                  <button id="afwBtn" class="btnSmallA">검색</button>
-                </div></div>
-                <div class="afw-chips">
-                  <span class="afw-chip">홍길동</span>
-                  <span class="afw-chip">인사과</span>
-                  <span class="afw-chip">서울청</span>
+              <div class="myLink ps" data-r="mylink" onclick="sel(event,'mylink')">
+                <div class="mylink-hd">
+                  <span>나의 업무링크</span>
+                  <div class="mylink-hd-btns">
+                    <a href="#" class="btnAll">전체</a>
+                    <a href="#" class="btnSmallA_01">설정</a>
+                  </div>
+                </div>
+                <div id="indexJoblink" class="link_area"><ul>
+                  <li><a href="#">결재함</a></li>
+                  <li><a href="#">메일</a></li>
+                  <li><a href="#">전자민원</a></li>
+                  <li><a href="#">온-나라(BMS)</a></li>
+                  <li><a href="#">e-사람</a></li>
+                  <li><a href="#">배우리</a></li>
+                  <li><a href="#">문서24</a></li>
+                  <li><a href="#">정부24</a></li>
+                </ul></div>
+                <div class="mylink-page">
+                  <button>◀</button>
+                  <span>1 / 2</span>
+                  <button>▶</button>
                 </div>
               </div>
-              <div class="myLink ps" data-r="mylink" onclick="sel(event,'mylink')">
-                <h5>나의 업무링크 <a href="#" class="btnAll">전체</a></h5>
-                <div id="indexJoblink" class="link_area"><ul>
-                  <li><a href="#">📋 결재함</a></li>
-                  <li><a href="#">📧 메일</a></li>
-                  <li><a href="#">📅 일정</a></li>
-                  <li><a href="#">📊 통계</a></li>
-                  <li><a href="#">🗂 문서함</a></li>
-                  <li><a href="#">🔔 알림</a></li>
-                  <li><a href="#">📁 자료실</a></li>
-                  <li><a href="#">🔍 검색</a></li>
-                </ul></div>
-              </div>
               <div class="dauri_faq ps" data-r="faq" onclick="sel(event,'faq')">
-                <h5 class="dauri_faq_link_l"><a href="#">📌 인사</a></h5>
-                <h5 class="dauri_faq_link_r"><a href="#">📰 언론스크랩</a></h5>
-                <h5 class="dauri_faq_link_l"><a href="#">📂 업무자료실</a></h5>
-                <h5 class="dauri_faq_link_r"><a href="#">💬 소통광장</a></h5>
+                <div class="faq-grid">
+                  <div class="faq-item"><a href="#">인사</a></div>
+                  <div class="faq-item"><a href="#">언론스크랩</a></div>
+                  <div class="faq-item"><a href="#">업무자료실</a></div>
+                  <div class="faq-item"><a href="#">소통광장</a></div>
+                  <div class="faq-item"><a href="#">정책공지</a></div>
+                  <div class="faq-item"><a href="#">보도자료</a></div>
+                </div>
                 <div id="helpdeskInfo" class="helpdesk_info">
                   헬프데스크: 02-2110-0000 | 평일 09:00~18:00
                 </div>
@@ -466,8 +494,8 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
 // ══════════════════════════════════════
 const DEF = () => ({
   colors:{
-    headerBg:'#1a3a6e', gnbBg:'#0f2744', gnbText:'#ffffff',
-    widgetHeaderBg:'#3b5998', widgetHeaderText:'#ffffff',
+    headerBg:'#ffffff', gnbBg:'#2a8080', gnbText:'#ffffff',
+    widgetHeaderBg:'#2a8080', widgetHeaderText:'#ffffff',
     menuHdBg:'#f1f1f1', menuHdText:'#333333', menuText:'#444444',
     accent:'#0a808f', btnDefault:'#435a7c', btnReset:'#2d7ee1', boardBg:'#ffffff',
     enabled:{
