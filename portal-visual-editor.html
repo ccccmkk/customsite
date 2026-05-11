@@ -216,6 +216,18 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
 .prop-lbl{font-size:10px;color:var(--txt2);width:54px;flex-shrink:0}
 .prop-inp{flex:1;background:var(--sur2);border:1px solid var(--bdr);border-radius:3px;padding:3px 5px;font-size:11px;color:var(--txt);outline:none;font-family:inherit;min-width:0}
 .prop-inp:focus{border-color:var(--acc)}
+/* Modebar */
+.modebar{height:36px;background:#0f172a;display:flex;align-items:center;padding:0 14px;gap:4px;flex-shrink:0;border-bottom:2px solid #1e293b}
+.mdbtn{height:26px;padding:0 14px;border-radius:13px;border:1px solid transparent;background:transparent;color:#475569;cursor:pointer;font-size:11px;font-family:inherit;font-weight:600;transition:all .15s;white-space:nowrap}
+.mdbtn:hover{color:#94a3b8;background:rgba(255,255,255,.05)}
+.mdbtn.active{background:var(--acc);color:#fff}
+.md-sep{width:1px;height:18px;background:#1e3a5f;margin:0 6px;flex-shrink:0}
+/* Arrange mode */
+.arrange-active .ps{outline:none!important}
+.arr-draggable{cursor:grab!important;position:relative}
+.arr-draggable::before{content:'⠿ 드래그';position:absolute;top:2px;right:4px;font-size:9px;color:rgba(255,255,255,.7);background:rgba(0,0,0,.3);padding:1px 4px;border-radius:2px;z-index:10;pointer-events:none}
+.arr-dragging{opacity:.5}
+.arr-over{outline:2px dashed var(--acc)!important;outline-offset:-2px}
 </style>
 </head>
 <body>
@@ -227,6 +239,14 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
   <button class="tb-btn" onclick="doImport()">📂 JSON 불러오기</button>
   <button class="tb-btn" onclick="doReset()">↺ 초기화</button>
   <button class="tb-btn p" onclick="doExport()">⬇ portalTheme.json 저장</button>
+</div>
+
+<div class="modebar">
+  <button class="mdbtn active" data-mode="style" onclick="setMode('style')">🎨 색상 편집</button>
+  <div class="md-sep"></div>
+  <button class="mdbtn" data-mode="arrange" onclick="setMode('arrange')">⊞ 배치 수정</button>
+  <div class="md-sep"></div>
+  <button class="mdbtn" data-mode="canvas" onclick="setMode('canvas')">🖼 캔버스</button>
 </div>
 
 <div class="main">
@@ -513,6 +533,7 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
     <div class="cv-toolbar" style="flex-shrink:0">
       <button class="cv-btn" onclick="addShape('rect')">＋ 도형</button>
       <button class="cv-btn" onclick="addShape('text')">＋ 텍스트</button>
+      <button class="cv-btn" onclick="addImageShape()">🖼 이미지</button>
       <div class="cv-sep"></div>
       <button class="cv-btn" onclick="shapeLayerUp()">↑ 앞으로</button>
       <button class="cv-btn" onclick="shapeLayerDown()">↓ 뒤로</button>
@@ -536,7 +557,6 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
       <div class="ctab" data-tab="layout" onclick="switchTab('layout')">⊞ 레이아웃</div>
       <div class="ctab" data-tab="board" onclick="switchTab('board')">📋 게시판</div>
       <div class="ctab" data-tab="css" onclick="switchTab('css')">{ } CSS</div>
-      <div class="ctab" data-tab="canvas" onclick="switchTab('canvas')">🖼 캔버스</div>
     </div>
     <div class="ctrl-scroll" id="ctrl-scroll"></div>
   </div>
@@ -578,6 +598,10 @@ const DEF = () => ({
     enabled:false,
     background:'#f0f2f5',
     shapes:[]
+  },
+  layoutOrder:{
+    widgets:['menu01','menu02','menu03','menu04','menu05'],
+    boards:['board_01','board_02','board_03','board_04']
   }
 });
 
@@ -669,6 +693,21 @@ function generateCSS(t) {
         css += `${sel}::after { content:'' !important; position:absolute !important; inset:0 !important; background: url("${cfg.imageData}") center/contain no-repeat !important; z-index:100 !important; pointer-events:none !important; }\n`;
     }
   });
+
+  const lo = t.layoutOrder || {};
+  if (lo.widgets) {
+    lo.widgets.forEach((key, i) => {
+      css += `.menu_infoArea div.${key} { order: ${i+1} !important; }\n`;
+    });
+  }
+  if (lo.boards) {
+    css += `#noticeZone.boardArea { display: flex !important; flex-wrap: wrap !important; }\n`;
+    css += `#noticeZone.boardArea > div { width: 50% !important; box-sizing: border-box !important; }\n`;
+    lo.boards.forEach((key, i) => {
+      const sel = key === 'board_01' ? '.notice1.board_01' : key === 'board_02' ? '.notice1.board_02' : key === 'board_03' ? '.notice2.board_03' : '.notice2.board_04';
+      css += `${sel} { order: ${i+1} !important; }\n`;
+    });
+  }
 
   if (t.customCSS?.trim()) css += '\n' + t.customCSS + '\n';
   return css;
@@ -1039,6 +1078,7 @@ function handleJSONImport(e) {
       if (t.boardPanels) Object.assign(theme.boardPanels, t.boardPanels);
       if (t.customCSS !== undefined) theme.customCSS = t.customCSS;
       if (t.customLayout) Object.assign(theme.customLayout, t.customLayout);
+      if (t.layoutOrder) Object.assign(theme.layoutOrder, t.layoutOrder);
       applyTheme(); renderCtrl();
       alert('테마 불러오기 완료!');
     } catch(err) { alert('불러오기 실패: ' + err.message); }
@@ -1138,6 +1178,18 @@ function initCanvas() {
   });
 }
 
+function shapeBackground(shape) {
+  if (shape.type === 'image') return 'none';
+  if (shape.fillType === 'linear') return `linear-gradient(${shape.gradDir||'135deg'},${shape.gradFrom||'#2a8080'},${shape.gradTo||'#0f4050'})`;
+  if (shape.fillType === 'radial') return `radial-gradient(circle,${shape.gradFrom||'#2a8080'},${shape.gradTo||'#0f4050'})`;
+  return shape.fill || '#2a8080';
+}
+
+function shapeShadow(shape) {
+  if (!shape.shadow) return 'none';
+  return `${shape.shadowX||0}px ${shape.shadowY!==undefined?shape.shadowY:4}px ${shape.shadowBlur!==undefined?shape.shadowBlur:12}px ${shape.shadowColor||'rgba(0,0,0,0.25)'}`;
+}
+
 function renderCanvas() {
   const cv = document.getElementById('cv');
   if (!cv) return;
@@ -1151,11 +1203,23 @@ function renderCanvas() {
     el.className = 'cv-shape' + (isSel ? ' sel' : '');
     el.id = 'cvs_' + shape.id;
     el.style.cssText = `left:${shape.x}px;top:${shape.y}px;width:${shape.w}px;height:${shape.h}px;`
-      + `background:${shape.fill||'#2a8080'};color:${shape.color||'#fff'};`
-      + `border-radius:${shape.borderRadius||0}px;font-size:${shape.fontSize||14}px;`
+      + `background:${shapeBackground(shape)};`
+      + (shape.type==='image' && shape.imageData ? `background-image:url(${shape.imageData});background-size:cover;background-position:center;background-repeat:no-repeat;` : '')
+      + `color:${shape.color||'#fff'};`
+      + `border-radius:${shape.borderRadius||0}px;`
+      + `font-size:${shape.fontSize||14}px;`
       + `font-weight:${shape.fontWeight||'bold'};`
       + `border:${shape.borderWidth||0}px solid ${shape.borderColor||'transparent'};`
-      + `z-index:${shape.zIndex||1};box-shadow:${shape.shadow?'0 2px 8px rgba(0,0,0,.2)':'none'};`;
+      + `box-shadow:${shapeShadow(shape)};`
+      + `opacity:${shape.opacity!==undefined?shape.opacity:1};`
+      + `filter:${shape.type==='image'&&shape.brightness!==undefined?'brightness('+shape.brightness+')':'none'};`
+      + `z-index:${shape.zIndex||1};padding:4px;`;
+    if (shape.type==='image' && shape.watermark) {
+      const wm = document.createElement('div');
+      wm.style.cssText='position:absolute;bottom:4px;right:6px;font-size:10px;color:rgba(255,255,255,0.7);text-shadow:0 1px 2px rgba(0,0,0,.5);pointer-events:none';
+      wm.textContent = shape.watermark;
+      el.appendChild(wm);
+    }
     if (shape.icon) {
       const ic = document.createElement('div');
       ic.className = 'si'; ic.style.fontSize = (shape.fontSize||14)*1.6+'px'; ic.textContent = shape.icon;
@@ -1198,16 +1262,44 @@ function addShape(type) {
     x:60+offset, y:60+offset,
     w: type==='text'?180:160, h: type==='text'?44:80,
     fill: type==='text'?'transparent':'#2a8080',
+    fillType:'solid', gradFrom:'#2a8080', gradTo:'#0f4050', gradDir:'135deg',
     color: type==='text'?'#1e293b':'#ffffff',
     text: type==='text'?'텍스트 입력':'메뉴',
     icon: type==='text'?'':'📋',
     fontSize:14, fontWeight:'bold',
     borderRadius: type==='text'?0:8,
     borderWidth:0, borderColor:'#ccc',
-    link:'', zIndex:shapes.length+1, shadow:false
+    link:'', zIndex:shapes.length+1,
+    shadow:false, shadowX:0, shadowY:4, shadowBlur:12, shadowColor:'rgba(0,0,0,0.25)'
   });
   cvSelId = id;
   renderCanvas(); renderCtrl();
+}
+
+function addImageShape() {
+  const fi = document.createElement('input');
+  fi.type = 'file'; fi.accept = 'image/*';
+  fi.onchange = e => {
+    const file = e.target.files[0]; if (!file) return;
+    const r = new FileReader();
+    r.onload = ev => {
+      const shapes = theme.customLayout.shapes;
+      const id = 'sh_'+Math.random().toString(36).slice(2,7);
+      const offset = (shapes.length%8)*16;
+      shapes.push({
+        id, type:'image',
+        x:60+offset, y:60+offset, w:240, h:160,
+        imageData:ev.target.result,
+        opacity:1.0, brightness:1.0, watermark:'',
+        borderRadius:0, borderWidth:0, borderColor:'#ccc',
+        shadow:false, shadowX:0, shadowY:4, shadowBlur:12, shadowColor:'rgba(0,0,0,0.25)',
+        zIndex: shapes.length+1
+      });
+      cvSelId = id; renderCanvas(); renderCtrl();
+    };
+    r.readAsDataURL(file);
+  };
+  fi.click();
 }
 
 function delShape() {
