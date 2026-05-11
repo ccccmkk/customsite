@@ -446,14 +446,15 @@ async function getPortalTab() {
   return tab;
 }
 
-// ── 적용 ──
+// ── 적용 (저장 포함) ──
 document.getElementById('btnApply').addEventListener('click', async () => {
   try {
     const theme = buildTheme();
+    await chrome.storage.local.set({ portalTheme: theme });
     const tab = await getPortalTab();
     await injectDirect(tab, theme);
     updateStatusBadge(true);
-    showMsg('✅ 적용됨');
+    showMsg('✅ 적용 + 저장됨');
   } catch(e) {
     showMsg('⚠️ ' + e.message, true);
   }
@@ -472,6 +473,73 @@ document.getElementById('btnSave').addEventListener('click', async () => {
     showMsg('💾 저장됨 (포털에서 새로고침하면 적용)');
   }
 });
+
+// ── JSON 불러오기 ──
+document.getElementById('btnImport').addEventListener('click', () => {
+  document.getElementById('jsonImportInput').click();
+});
+
+document.getElementById('jsonImportInput').addEventListener('change', e => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const theme = JSON.parse(ev.target.result);
+      if (!theme || typeof theme !== 'object') throw new Error('유효하지 않은 JSON');
+      loadThemeToUI(theme);
+      showMsg('📂 불러오기 완료 — 적용 버튼으로 반영');
+    } catch(err) {
+      showMsg('⚠️ JSON 파싱 오류: ' + err.message, true);
+    }
+    e.target.value = '';
+  };
+  reader.readAsText(file);
+});
+
+function loadThemeToUI(theme) {
+  // 색상
+  const c = theme.colors || {};
+  COLOR_KEYS.forEach(k => {
+    if (!c[k]) return;
+    const cp = document.getElementById('cp_'+k);
+    const hx = document.getElementById('hx_'+k);
+    if (cp) cp.value = c[k];
+    if (hx) hx.value = c[k];
+  });
+  const en = c.enabled || {};
+  Object.keys(en).forEach(k => setToggle(k, en[k]));
+
+  // 배경
+  if (Array.isArray(theme.backgrounds)) bgCards = theme.backgrounds;
+  renderBgList();
+
+  // 게시판 패널
+  if (theme.boardPanels) {
+    BOARD_PANEL_DEFS.forEach(d => {
+      if (theme.boardPanels[d.key]) Object.assign(boardPanelConfig[d.key], theme.boardPanels[d.key]);
+    });
+  }
+  renderBoardPanels();
+
+  // 메뉴 설정
+  const mc = theme.menuConfig || {};
+  MENU_KEYS.forEach(k => {
+    const el = document.getElementById('mc_'+k);
+    if (el) el.checked = mc[k] !== false;
+  });
+
+  // 레이아웃 설정
+  const lc = theme.layoutConfig || {};
+  Object.keys(LAYOUT_DEFAULTS).forEach(k => {
+    const el = document.getElementById('lc_'+k);
+    if (el) el.checked = lc[k] !== undefined ? lc[k] : LAYOUT_DEFAULTS[k];
+  });
+
+  // 커스텀 CSS
+  const cssEl = document.getElementById('customCSS');
+  if (cssEl && theme.customCSS !== undefined) cssEl.value = theme.customCSS;
+}
 
 // ── 초기화 ──
 document.getElementById('btnReset').addEventListener('click', async () => {
