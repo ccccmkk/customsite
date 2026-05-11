@@ -199,6 +199,9 @@ const LAYOUT_DEFAULTS = {
   menuUlHidden:     false,
 };
 
+// ── 캔버스 레이아웃 (비주얼 에디터에서 import) ──
+let customLayout = null;
+
 // ── 게시판 · 알림판 패널 ──
 const BOARD_PANEL_DEFS = [
   { key: 'board_01', label: '게시판① 정책/교육/일반공지', icon: '📋' },
@@ -309,7 +312,7 @@ function buildTheme() {
     if (el) layoutConfig[k] = el.checked;
   });
 
-  return {
+  const theme = {
     colors,
     backgrounds: bgCards.filter(c => c.imageData),
     menuConfig,
@@ -317,6 +320,8 @@ function buildTheme() {
     boardPanels: boardPanelConfig,
     customCSS: document.getElementById('customCSS').value
   };
+  if (customLayout) theme.customLayout = customLayout;
+  return theme;
 }
 
 // ── CSS 생성 (popup에서도 사용) ──
@@ -414,8 +419,15 @@ function generateCSS(theme) {
   return css;
 }
 
-// ── 페이지에 직접 CSS 주입 (content script 없어도 동작) ──
+// ── 페이지에 테마 적용 ──
 async function injectDirect(tab, theme) {
+  // content script에 전체 테마 전달 (customLayout 포함)
+  try {
+    await chrome.tabs.sendMessage(tab.id, { type: 'apply', theme });
+    return;
+  } catch(e) {
+    // content script 미로드 시 CSS만 직접 주입
+  }
   const css = generateCSS(theme);
   await chrome.scripting.executeScript({
     target: { tabId: tab.id },
@@ -539,6 +551,9 @@ function loadThemeToUI(theme) {
   // 커스텀 CSS
   const cssEl = document.getElementById('customCSS');
   if (cssEl && theme.customCSS !== undefined) cssEl.value = theme.customCSS;
+
+  // 캔버스 레이아웃
+  if (theme.customLayout) customLayout = theme.customLayout;
 }
 
 // ── 초기화 ──
@@ -622,4 +637,7 @@ chrome.storage.local.get('portalTheme', data => {
   if (theme.customCSS) {
     document.getElementById('customCSS').value = theme.customCSS;
   }
+
+  // 캔버스 레이아웃 복원
+  if (theme.customLayout) customLayout = theme.customLayout;
 });
