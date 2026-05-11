@@ -695,18 +695,19 @@ function generateCSS(t) {
     }
   });
 
+  const DEF_WIDGET_ORDER = ['menu01','menu02','menu03','menu04','menu05'];
+  const DEF_BOARD_ORDER  = ['board_01','board_02','board_03','board_04'];
   const lo = t.layoutOrder || {};
-  if (lo.widgets) {
+
+  if (lo.widgets && JSON.stringify(lo.widgets) !== JSON.stringify(DEF_WIDGET_ORDER)) {
     lo.widgets.forEach((key, i) => {
       css += `.menu_infoArea div.${key} { order: ${i+1} !important; }\n`;
     });
   }
-  if (lo.boards) {
-    css += `#noticeZone.boardArea { display: flex !important; flex-wrap: wrap !important; }\n`;
-    css += `#noticeZone.boardArea > div { width: 50% !important; box-sizing: border-box !important; }\n`;
+  if (lo.boards && JSON.stringify(lo.boards) !== JSON.stringify(DEF_BOARD_ORDER)) {
+    const BSEL = { board_01:'.notice1.board_01', board_02:'.notice1.board_02', board_03:'.notice2.board_03', board_04:'.notice2.board_04' };
     lo.boards.forEach((key, i) => {
-      const sel = key === 'board_01' ? '.notice1.board_01' : key === 'board_02' ? '.notice1.board_02' : key === 'board_03' ? '.notice2.board_03' : '.notice2.board_04';
-      css += `${sel} { order: ${i+1} !important; }\n`;
+      if (BSEL[key]) css += `${BSEL[key]} { order: ${i+1} !important; }\n`;
     });
   }
 
