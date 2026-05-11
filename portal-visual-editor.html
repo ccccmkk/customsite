@@ -200,8 +200,8 @@ textarea.css-ta{width:100%;height:180px;background:#1e293b;color:#e2e8f0;border:
 .nk-btn.ok{background:#0d9488;color:#fff;border-color:#0d9488}
 .nk-btn.ok:hover{background:#0f766e}
 .nk-btn.undo{color:#f59e0b;border-color:#f59e0b}
-.nk-body{flex:1;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:20px;background:#334155;position:relative}
-#nk-cv-wrap{padding:10px;display:inline-block;transform-origin:top left}
+.nk-body{flex:1;overflow:auto;display:flex;align-items:center;justify-content:center;padding:20px;background:#334155;position:relative}
+#nk-cv-wrap{padding:10px;display:inline-block}
 #nk-cv{cursor:crosshair;display:block;background:repeating-conic-gradient(#64748b 0% 25%,#94a3b8 0% 50%) 0 0/16px 16px;image-rendering:pixelated}
 .nk-status{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,.7);color:#fff;font-size:11px;padding:5px 14px;border-radius:12px;pointer-events:none;opacity:0;transition:opacity .3s}
 .nk-status.show{opacity:1}
@@ -1431,6 +1431,7 @@ function addShape(type) {
     link:'', zIndex:shapes.length+1,
     shadow:false, shadowX:0, shadowY:4, shadowBlur:12, shadowColor:'rgba(0,0,0,0.25)'
   });
+  theme.customLayout.enabled = true;
   cvSelId = id;
   renderCanvas(); renderCtrl();
 }
@@ -1454,6 +1455,7 @@ function addImageShape() {
         shadow:false, shadowX:0, shadowY:4, shadowBlur:12, shadowColor:'rgba(0,0,0,0.25)',
         zIndex: shapes.length+1
       });
+      theme.customLayout.enabled = true;
       cvSelId = id; renderCanvas(); renderCtrl();
     };
     r.readAsDataURL(file);
@@ -1464,6 +1466,7 @@ function addImageShape() {
 function delShape() {
   if (!cvSelId) return;
   theme.customLayout.shapes = theme.customLayout.shapes.filter(s=>s.id!==cvSelId);
+  if (!theme.customLayout.shapes.length) theme.customLayout.enabled = false;
   cvSelId = null; renderCanvas(); renderCtrl();
 }
 
@@ -1536,23 +1539,21 @@ function openNukkiEditor(shapeId) {
   }
 
   function applyZoom() {
-    const wrap = document.getElementById('nk-cv-wrap');
-    if (!wrap) return;
-    wrap.style.transform = `scale(${nkZoom})`;
-    wrap.style.transformOrigin = 'top left';
-    wrap.style.width  = nkCv.width  + 'px';
-    wrap.style.height = nkCv.height + 'px';
-    // Expand scrollable area
-    nkBody.style.minWidth  = Math.round(nkCv.width  * nkZoom + 40) + 'px';
-    nkBody.style.minHeight = Math.round(nkCv.height * nkZoom + 40) + 'px';
+    if (!nkCv) return;
+    const scaledW = Math.round(nkCv.width  * nkZoom);
+    const scaledH = Math.round(nkCv.height * nkZoom);
+    nkCv.style.width  = scaledW + 'px';
+    nkCv.style.height = scaledH + 'px';
+    nkBody.style.minWidth  = scaledW + 40 + 'px';
+    nkBody.style.minHeight = scaledH + 40 + 'px';
   }
 
   function fitZoom() {
     const maxW = nkBody.clientWidth  - 40;
     const maxH = nkBody.clientHeight - 40;
     nkZoom = Math.min(maxW / nkCv.width, maxH / nkCv.height, 2);
-    nkBody.style.minWidth = ''; nkBody.style.minHeight = '';
     applyZoom();
+    nkBody.style.minWidth = ''; nkBody.style.minHeight = '';
   }
 
   function saveHistory() {
