@@ -789,6 +789,8 @@ function switchTab(tab) {
 function renderCtrl() {
   const s = document.getElementById('ctrl-scroll');
   s.innerHTML = '';
+  if (currentMode === 'canvas')  { renderCanvasCtrl(s); return; }
+  if (currentMode === 'arrange') { renderArrangeCtrl(s); return; }
   if (currentTab === 'colors') renderColors(s);
   else if (currentTab === 'bg') renderBg(s);
   else if (currentTab === 'menu') renderMenu(s);
@@ -1467,6 +1469,37 @@ function shapeLayerDown() {
   if (idx > 0) { [shapes[idx],shapes[idx-1]]=[shapes[idx-1],shapes[idx]]; renderCanvas(); renderCtrl(); }
 }
 
+// ── 누끼 따기 (배경 제거) ──
+function removeBg(shapeId, tolerance) {
+  const shape = theme.customLayout.shapes.find(s=>s.id===shapeId);
+  if (!shape?.imageData) return;
+  const img = new Image();
+  img.onload = () => {
+    const cv = document.createElement('canvas');
+    cv.width = img.width; cv.height = img.height;
+    const ctx = cv.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const d = ctx.getImageData(0, 0, cv.width, cv.height);
+    const px = d.data;
+    // Sample background from 4 corners, pick most common
+    const sampleCorners = () => {
+      const pts = [0, (cv.width-1)*4, (cv.height-1)*cv.width*4, ((cv.height-1)*cv.width+(cv.width-1))*4];
+      const colors = pts.map(i=>[px[i],px[i+1],px[i+2]]);
+      return colors.reduce((a,b) => a, colors[0]); // top-left as primary
+    };
+    const bg = sampleCorners();
+    const tol = (tolerance || 30) * (tolerance || 30);
+    for (let i=0; i<px.length; i+=4) {
+      const dr=px[i]-bg[0], dg=px[i+1]-bg[1], db=px[i+2]-bg[2];
+      if (dr*dr + dg*dg + db*db < tol) px[i+3]=0;
+    }
+    ctx.putImageData(d, 0, 0);
+    shape.imageData = cv.toDataURL('image/png');
+    renderCanvas(); renderCtrl();
+  };
+  img.src = shape.imageData;
+}
+
 function renderCanvasCtrl(cont) {
   const layout = theme.customLayout;
   cont.innerHTML = '';
@@ -1513,6 +1546,28 @@ function renderCanvasCtrl(cont) {
         fi.click();
       };
       cont.appendChild(chgBtn);
+
+      // 누끼 따기
+      const nukBtn=mk('button','tb-btn'); nukBtn.style.cssText='width:100%;margin-top:4px;color:#7c3aed;border-color:#7c3aed';
+      nukBtn.textContent='✂ 누끼 따기 (배경 제거)';
+      nukBtn.onclick=()=>{
+        // Show tolerance slider inline
+        const existing=document.getElementById('nukki-panel');
+        if (existing){existing.remove();return;}
+        const panel=mk('div'); panel.id='nukki-panel';
+        panel.style.cssText='background:var(--sur2);border:1px solid #7c3aed;border-radius:4px;padding:8px;margin-top:4px';
+        const info=mk('div','hint-text'); info.textContent='배경 허용 범위: 클수록 더 많이 제거. 배경색이 단순할수록 잘 됩니다.';
+        panel.appendChild(info);
+        let tol=30;
+        const slRow=mkSlider('허용 범위', 5, 80, 1, tol, v=>{tol=v;}, v=>v);
+        panel.appendChild(slRow);
+        const applyBtn=mk('button','tb-btn'); applyBtn.style.cssText='width:100%;margin-top:6px;background:#7c3aed;color:#fff;border-color:#7c3aed';
+        applyBtn.textContent='✂ 적용';
+        applyBtn.onclick=()=>{ panel.remove(); removeBg(shape.id, tol); };
+        panel.appendChild(applyBtn);
+        nukBtn.insertAdjacentElement('afterend', panel);
+      };
+      cont.appendChild(nukBtn);
 
       cont.appendChild(mkSlider('투명도', 0, 1, 0.05, shape.opacity!==undefined?shape.opacity:1, v=>{shape.opacity=v;renderCanvas();}, v=>Math.round(v*100)+'%'));
       cont.appendChild(mkSlider('밝기', 0.1, 2, 0.05, shape.brightness!==undefined?shape.brightness:1, v=>{shape.brightness=v;renderCanvas();}, v=>Math.round(v*100)+'%'));
